@@ -22,59 +22,45 @@
         top: 30vh;
         left: 40vw;
         color: white;
-        font-size: 1em;
-        text-align: center;
-        padding: 1%;
-    }
-    .loginheader{
         font-size: 2em;
-        margin-bottom: 7%;
+        text-align: center;
     }
-    .formlabel{
-        position: relative;
-        
-        margin-bottom: 7%;
-    }
+
     .loginbutton {
         background-color: orange;
         position: relative;
         height: auto;
         width: 10vw;
         top: 0vh;
-        left: 0%;
-        font-size: 1em;
+        left: 25%;
+        font-size: 0.7em;
         text-align: center;
-        margin-bottom: 3%;
     }
+
     .signupbox {
         background-color: orange;
         position: relative;
         height: auto;
         width: 10vw;
         top: 0vh;
-        left: 0%;
-        font-size: 1em;
+        left: 25%;
+        font-size: 0.7em;
         text-align: center;
     }
 </style>
 
 <body>
     <div class="signinbox">
-        <div class="loginheader">Login</div>
+        TEST Register Page Hahaha+
         <form>
-            <label class="formlabel" for="Email">E-mail</label><br>
-            <input id="email" type="email"><br>
+            <label for="Email">E-mail</label><br>
+            <input type="email" id="email"><br>
             <label for="Password">Password</label><br>
-            <input id="password" type="password">
-            <input id="signIn" class="loginbutton" type="button" value="Login">
-            <input onclick="location.href='./signup.html'" class="signupbox" type="button" value="Sign Up">
+            <input type="password" id="password">
+            <input type="button" id="signUp" value="Sign Up" class="signupbox">
+            <input type="button" id="signIn" value="Sign In" class="signupbox">
         </form>
-        <!-- <div class="loginbutton">
-            Login
-        </div>
-        <div class="signupbox">
-            Sign up
-        </div> -->
+
     </div>
 </body>
 <script type="module">
@@ -105,6 +91,23 @@
     const database = getDatabase(app);
     const auth = getAuth();
 
+    signUp.addEventListener('click', (e) => {
+        var email = document.getElementById('email').value;
+        var password = document.getElementById('password').value;
+
+        createUserWithEmailAndPassword(auth, email, password)
+            .then((userCredential) => {
+                // Signed in 
+                const user = userCredential.user;
+                alert("Create sucksess Yes tood");
+            })
+            .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                alert(errorMessage);
+            });
+    });
+
     signIn.addEventListener('click', (e) => {
         var email = document.getElementById('email').value;
         var password = document.getElementById('password').value;
@@ -121,5 +124,6 @@
                 alert(errorMessage);
             });
     })
-  </script>
+</script>
+
 </html>

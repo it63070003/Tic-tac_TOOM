@@ -14,7 +14,7 @@
         font-family: Rye;
     }
 
-    .signinbox {
+    .signupbox {
         background-color: black;
         position: relative;
         width: 20vw;
@@ -32,7 +32,7 @@
     }
     .formlabel{
         position: relative;
-        
+        left:0%;
         margin-bottom: 7%;
     }
     .loginbutton {
@@ -41,12 +41,12 @@
         height: auto;
         width: 10vw;
         top: 0vh;
-        left: 0%;
+        left: 25%;
         font-size: 1em;
         text-align: center;
         margin-bottom: 3%;
     }
-    .signupbox {
+    .signupbutton {
         background-color: orange;
         position: relative;
         height: auto;
@@ -59,20 +59,18 @@
 </style>
 
 <body>
-    <div class="signinbox">
-        <div class="loginheader">Login</div>
+    <div class="signupbox">
+        <div class="loginheader">Signup</div>
         <form>
             <label class="formlabel" for="Email">E-mail</label><br>
             <input id="email" type="email"><br>
             <label for="Password">Password</label><br>
-            <input id="password" type="password">
-            <input id="signIn" class="loginbutton" type="button" value="Login">
-            <input onclick="location.href='./signup.html'" class="signupbox" type="button" value="Sign Up">
+            <input id="password1" type="password"><br>
+            <label for="Password">Confirm Password</label><br>
+            <input id="password2" type="password">
+            <input type="button" id="signUp" value="Sign Up" class="signupbutton">
         </form>
-        <!-- <div class="loginbutton">
-            Login
-        </div>
-        <div class="signupbox">
+        <!-- <div class="signupbox">
             Sign up
         </div> -->
     </div>
@@ -105,21 +103,27 @@
     const database = getDatabase(app);
     const auth = getAuth();
 
-    signIn.addEventListener('click', (e) => {
+    signUp.addEventListener('click', (e) => {
         var email = document.getElementById('email').value;
-        var password = document.getElementById('password').value;
+        var password1 = document.getElementById('password1').value;
+        var password2 = document.getElementById('password2').value;
 
-        signInWithEmailAndPassword(auth, email, password)
+        if(password1 == password2){
+            createUserWithEmailAndPassword(auth, email, password1)
             .then((userCredential) => {
                 // Signed in 
                 const user = userCredential.user;
-                alert("You're in take care of your self");
+                alert("Create sucksess Yes tood");
             })
             .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
                 alert(errorMessage);
             });
-    })
+        }
+        else{
+            alert("Password do not match!");
+        }
+    });
   </script>
 </html>
