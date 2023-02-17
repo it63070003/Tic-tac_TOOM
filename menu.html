@@ -18,17 +18,51 @@
         background-color: black;
         position: relative;
         width: 20vw;
+        top: 20vh;
+        left: 40vw;
+        color: white;
+        font-size: 2em;
+        text-align: center;
+    }
+
+    .helpbox {
+        background-color: black;
+        position: relative;
+        width: 20vw;
         top: 30vh;
         left: 40vw;
         color: white;
         font-size: 2em;
         text-align: center;
     }
-    .helpbox {
+
+    .profilebox {
+        background-color: black;
+        position: relative;
+        width: 20vw;
+        top: 40vh;
+        left: 40vw;
+        color: white;
+        font-size: 2em;
+        text-align: center;
+    }
+
+    .leaderboardbox {
         background-color: black;
         position: relative;
         width: 20vw;
         top: 50vh;
+        left: 40vw;
+        color: white;
+        font-size: 2em;
+        text-align: center;
+    }
+
+    .signoutbox {
+        background-color: black;
+        position: relative;
+        width: 20vw;
+        top: 60vh;
         left: 40vw;
         color: white;
         font-size: 2em;
@@ -43,6 +77,62 @@
     <div class="helpbox">
         HELP
     </div>
+    <div onclick="location.href='./profile.html'" class="profilebox">
+        PROFILE
+    </div>
+    <div class="leaderboardbox">
+        LEADERBOARD
+    </div>
+    <div id='signOut' class="signoutbox">
+        SIGN OUT
+    </div>
+    <h1 id="nickname">แสดงชื่อตรงนี้Hello</h1>
 </body>
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics.js";
+    import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+
+    // Your web app's Firebase configuration
+    // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+    const firebaseConfig = {
+        apiKey: "AIzaSyC0KXbQP2TRfHS544PCO0Lyuykyy8smk3s",
+        authDomain: "tictactoom-420xd.firebaseapp.com",
+        databaseURL: "https://tictactoom-420xd-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "tictactoom-420xd",
+        storageBucket: "tictactoom-420xd.appspot.com",
+        messagingSenderId: "713753276707",
+        appId: "1:713753276707:web:7b21e628d8380a680ddc96",
+        measurementId: "G-QTPBT2T1H2"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const database = getDatabase(app);
+    const auth = getAuth();
+
+    //const userId = ;
+    onAuthStateChanged(auth, user => {
+        let userId = auth.currentUser.uid;
+        onValue(ref(database, 'Users/' + userId + '/name'), (snapshot) => {
+            var data = snapshot.val();
+            console.log(data);
+            document.getElementById('nickname').innerText = data;
+        });
+    });
+
+    var logOut = document.getElementById("signOut");
+    logOut.addEventListener('click', (e) =>{
+        signOut(auth).then(() => {
+            // Sign-out successful.
+            console.log("SignOutSuccess");
+            window.location = './index.html';
+        }).catch((error) => {
+            // An error happened.
+            console.log("ERROR SIGN OUT: " + error);
+        });
+    });
+</script>
 
 </html>

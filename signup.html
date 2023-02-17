@@ -26,15 +26,18 @@
         text-align: center;
         padding: 1%;
     }
-    .loginheader{
+
+    .loginheader {
         font-size: 2em;
         margin-bottom: 7%;
     }
-    .formlabel{
+
+    .formlabel {
         position: relative;
-        left:0%;
+        left: 0%;
         margin-bottom: 7%;
     }
+
     .loginbutton {
         background-color: orange;
         position: relative;
@@ -46,6 +49,7 @@
         text-align: center;
         margin-bottom: 3%;
     }
+
     .signupbutton {
         background-color: orange;
         position: relative;
@@ -79,7 +83,7 @@
     // Import the functions you need from the SDKs you need
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics.js";
-    import { getDatabase } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
     import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
     // TODO: Add SDKs for Firebase products that you want to use
     // https://firebase.google.com/docs/web/setup#available-libraries
@@ -104,26 +108,45 @@
     const auth = getAuth();
 
     signUp.addEventListener('click', (e) => {
-        var email = document.getElementById('email').value;
+        var signUpEmail = document.getElementById('email').value;
         var password1 = document.getElementById('password1').value;
         var password2 = document.getElementById('password2').value;
 
-        if(password1 == password2){
-            createUserWithEmailAndPassword(auth, email, password1)
-            .then((userCredential) => {
-                // Signed in 
-                const user = userCredential.user;
-                alert("Create sucksess Yes tood");
-            })
-            .catch((error) => {
-                const errorCode = error.code;
-                const errorMessage = error.message;
-                alert(errorMessage);
-            });
+        if (password1 == password2) {
+            createUserWithEmailAndPassword(auth, signUpEmail, password1)
+                .then((userCredential) => {
+                    // Signed in 
+                    const user = userCredential.user;
+                    set(ref(database, 'Users/' + user.uid), {
+                        name: "Guest",
+                        email: signUpEmail,
+                        win: 0,
+                        lose: 0,
+                        total: 0,
+                    });
+                    signInWithEmailAndPassword(auth, signUpEmail, password1)
+                        .then((userCredential) => {
+                            // Signed in 
+                            const user = userCredential.user;
+                            console.log("You're in take care of your self");
+                            window.location = './menu.html';
+                        })
+                        .catch((error) => {
+                            const errorCode = error.code;
+                            const errorMessage = error.message;
+                            alert(errorMessage);
+                        });
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    alert(errorMessage);
+                });
         }
-        else{
+        else {
             alert("Password do not match!");
         }
     });
-  </script>
+</script>
+
 </html>
