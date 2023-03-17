@@ -1,0 +1,30 @@
+body {
+    font-family: Rye;
+}
+
+.container{
+    margin:auto;
+}
+/* .turn-text{
+    text-align: center;
+}
+.item-text{
+    text-align: center;
+} */
+.player-icon{
+    text-align: center;
+}
+.shapeImage{
+    height: auto;
+    width:75%;
+}
+.table-block{
+    width: 100px;
+    height: 100px;
+    color: black;
+    font-size: 3em;
+    font-weight: bold;
+    line-height: 50px;
+    border: solid 1px black;
+    text-align: center;
+  }
