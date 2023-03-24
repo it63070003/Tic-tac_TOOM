@@ -17,6 +17,7 @@ body {
 .shapeImage{
     height: auto;
     width:75%;
+    z-index: -100;
 }
 .table-block{
     width: 100px;
