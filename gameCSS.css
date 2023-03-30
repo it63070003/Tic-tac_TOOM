@@ -29,3 +29,22 @@ body {
     border: solid 1px black;
     text-align: center;
   }
+
+  .ml4 {
+    position: absolute;
+    font-weight: 900;
+    font-size: 2em;
+    width:10vw;
+    height: 10vh;
+    left: 50vw;
+    top: 50vh;
+    transform: translateX(-50%), translateY(-50%);
+  }
+.alertbox{
+    position: relative;
+    width: auto;
+    height: auto;
+    top: 0vh;
+    left: 0vw;
+
+}

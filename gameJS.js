@@ -8,35 +8,70 @@ var turnObject = document.getElementById('turn');
 var game_continue = true;
 var usingItem = false;
 
+var playerMove = '';
+var playerAction = {};
+var enemyMove = '';
+var enemyAction = {};
+
+var trappedBlock = '';
+
 for (block of blocks) {
     let blockId = block.id;
-    block.addEventListener('click',function(event) {
+    block.addEventListener('click', function (event) {
         // modify the condition here to continue the game play as long as there is no winner
         if (!game_continue) {
             block.onclick = null;
             return false;
         }
-
+        if (turn != playerShape) {
+            return false;
+        }
         let shapeValue = event.currentTarget.getAttribute('data-shape');
         let action = event.currentTarget.getAttribute('data-action'); // "E", "gun-shoot", "trap-place", "spy-select", "spy-guess" ,"bull-select", "bull-move"
-        if (shapeValue == 'E' && action == 'E' && !usingItem) {
+        
+        if(shapeValue == 'E' && event.currentTarget.id == trappedBlock && !usingItem){
+            console.log("TRAPPED!!!!!");
+            let trapText = `<h1 class="ml4">
+                            Trapped
+                            </h1>`
+            let trapTextElem = document.createRange().createContextualFragment(trapText);
+            //event.currentTarget.appendChild(trapTextElem);
+            document.getElementById('table').appendChild(trapTextElem);
+
+            
+            randomItem() ? usingItem = true : endTurn();
+        }else if (shapeValue == 'E' && action == 'E' && !usingItem) {
             // 4. Modify the code here to check whether the clicking block is avialable.
-            event.currentTarget.setAttribute('data-shape', turn);
-            changeImage(blockId, turn);
-            if(checkResult()){
+            changeShape(event.currentTarget.id, playerShape);
+
+            playerMove = event.currentTarget.id;
+            updateMoveToEnemy(playerMove);
+
+            if (checkResult()) {
                 return true;
             }
             //!!!!!!!!!!!TEST NO ENEMY SHOULD USE ITEM
             randomItem() ? usingItem = true : endTurn();
 
         } else if (shapeValue != 'E' && action == "gun") {
-            useGun(this);
+            let shootPos = useGun(this);
+            playerAction = { "item": 'gun', "pos": shootPos };
+            updateActionToEnemy(playerAction);
+
+            endTurn();
+        } else if (shapeValue == 'E' && action == "trap") {
+            let trapPos = useTrap(this);
+            playerAction = { "item": 'trap', "pos": trapPos };
+            updateActionToEnemy(playerAction);
+
             endTurn();
         }
     });
 }
 
-function changeImage(pos, shape) {
+function changeShape(pos, shape) {
+    document.getElementById(pos).setAttribute('data-shape', shape);
+
     if (shape == 'E') {
         document.getElementById(pos).innerHTML = ``;
     } else {
@@ -48,7 +83,7 @@ function changeImage(pos, shape) {
 function randomItem() {
     console.log('randomitem!');
     //let itemIndex = Math.floor(Math.random() * 4);
-    let itemIndex = 0; //!!!!!!!!!Test item
+    let itemIndex = 1; //!!!!!!!!!Test item
 
     let itemsString = ['gun', 'trap', 'spy', 'bull']
     let itemsImg = ['images/gun_icon.webp', 'images/trap_icon.webp', 'images/spy_icon.webp', 'images/bull_icon.webp']
@@ -60,8 +95,9 @@ function useItem(item) {
         case 'gun':
             return checkGun();
             break;
-        case 'y':
+        case 'trap':
             // code block
+            return checkTrap();
             break;
         default:
         // code block
@@ -74,40 +110,55 @@ function checkGun() {
         if (block.getAttribute('data-shape') == playerShape) {
             // block = B2  Check B1 A2 B3 C2
             let blockPos = block.getAttribute('id')
-            //ซ้าย
-            try {
-                let leftBlock = document.getElementById(blockPos[0] + (parseInt(blockPos[1]) - 1).toString());
-                if (leftBlock.getAttribute('data-shape') == enemyShape) {
-                    // leftBlock.innerHTML = '';
-                    // leftBlock.setAttribute('shape', '');
-                    leftBlock.setAttribute('data-action', 'gun');
-                    leftBlock.style.backgroundColor = 'red';
-                    usable = true;
-                    //Gun วาง > Random เรียก Check > check(ยิงได้?)ยิงได้:setdata-action=gun+เปลี่ยนสีBG(checkGun) > กด+ใช้function useGun ทำลาย X/O > resetdata-Action+resetBG ทุกอัน
-                    //Trap วาง > Random เรียก Check > check(วางได้?)+setdata-action=trap+เปลี่ยนสี(checkTrap) > กด+ใช้Item(useTrap)+data-isTrapped > resetAction+resetBG
-                    //Spy วาง > Random เรียก Check > check(Enemyshape?)+setdata-action=spy-select+เปลี่ยนสี(checkGun)คล้ายปืนแต่ทุกตัวใน map > กด+ใช้Item(useSpy)+data-isSpy > resetAction+resetBG >
-                    //ฝั่งศัตรู checkStartTurn(spy?) > check(PlayerShape?)+setdata-action=spy-guess+เปลี่ยนสีBG(checkSpyGuess) > กด+Check(correct?) resetAction+resetBG Wrong > Chage To Enemy Shape / Correct > Continue
-                    //Bull วาง > Random เรียก Check > check(EnemyShape)+setdataAction=bull-select+เปลี่ยนสี(checkBull) > กด+ใช้Item(useBull)+setdata-isBlocked=true> resetAction+resetBG > Check(วางได้?)+setdata-action=bull move+ เปลี่ยนสี BG > กด+ใช้ ทำลายตัวก่อน และวางตรงที่เลือก
-                    //ฝั่งศัตรู checkStartTurn(Bull?) > Check(dataaction=blocked?) เปลี่ยนสี BG
-                    //Revolver วาง > Random เรียก Check > check(3อัน?) > จบเทิน function Roulett() >game cont = false game win by X/O
-                }
-            }
-            catch (err) {
-            }
+            let leftBlock = document.getElementById(blockPos[0] + (parseInt(blockPos[1]) - 1).toString());
+            let rightBlock = document.getElementById(blockPos[0] + (parseInt(blockPos[1]) + 1).toString());
+            let upBlock = document.getElementById(String.fromCharCode(blockPos[0].charCodeAt(0) - 1) + blockPos[1]);
+            let downBlock = document.getElementById(String.fromCharCode(blockPos[0].charCodeAt(0) + 1) + blockPos[1]);
 
+            checkBlock(leftBlock);
+            checkBlock(rightBlock);
+            checkBlock(upBlock);
+            checkBlock(downBlock);
+        }
+    }
+    function checkBlock(thatBlock) {
+        try {
+            if (thatBlock.getAttribute('data-shape') == enemyShape) {
+                thatBlock.setAttribute('data-action', 'gun');
+                thatBlock.style.backgroundColor = 'red';
+                usable = true;
+            }
+        } catch (err) {
+        }
+    }
+    return usable;
+}
+
+function checkTrap() {
+    let usable = false;
+    for (block of blocks) {
+        if (block.getAttribute('data-shape') == 'E') {
+            block.setAttribute('data-action', 'trap');
+            block.style.backgroundColor = 'pink';
+            usable = true;
         }
     }
     return usable;
 }
 
 function useGun(shape) {
-    destroyShape(shape);
+    let shapePos = shape.id;
+    destroyShape(shapePos);
+    return shapePos;
 }
 
-function destroyShape(shape) {
+function useTrap(shape) {
     let shapePos = shape.id;
-    shape.setAttribute('data-shape', 'E')
-    changeImage(shape.id, 'E');
+    return shapePos;
+}
+
+function destroyShape(shapePos) {
+    changeShape(shapePos, 'E')
 
 }
 
@@ -194,13 +245,61 @@ function endTurn() {
     turn = turn === 'O' ? 'X' : 'O';
     turnObject.innerHTML = "Turn: " + turn;
     usingItem = false;
-    startTurn();
-}
 
-function startTurn() {
     //reset data-action, BG
     for (block of blocks) {
         block.setAttribute('data-action', 'E');
         block.style.backgroundColor = 'white';
     }
+    //startTurn();//อีกฝ่าย
 }
+
+function startTurn() {
+    turn = turn === 'O' ? 'X' : 'O';
+
+}
+
+function updateMoveToEnemy(playerMove) {
+    console.log("Player Move : " + playerMove + " Sended")
+}
+
+function updateActionToEnemy(playerAction) {
+    console.log("Player Action : " + playerAction + " Sended")
+}
+
+
+//ทดสอบอาจเอาออกทีหลัง
+function updateEnemyMove() {
+    enemyMove = document.getElementById("enemyMovePos").value;
+    changeShape(enemyMove, enemyShape);
+
+    console.log(enemyMove)
+}
+
+function updateEnemyAction() {
+    let enemyItem = document.getElementById("enemyActionItem").value;
+    let enemyActionPos = document.getElementById("enemyActionPos").value;
+    enemyAction = { "item": enemyItem, "pos": enemyActionPos };
+
+    switch (enemyAction["item"]) {
+        case 'gun':
+            enemyGun(enemyAction["pos"]);
+            break;
+        case 'trap':
+            enemyTrap(enemyAction["pos"]);
+            break;
+        default:
+        // code block
+    }
+
+    startTurn();
+
+    function enemyGun(pos) {
+        destroyShape(pos);
+    }
+    function enemyTrap(pos){
+        trappedBlock = pos;
+    }
+}
+
+// animation
