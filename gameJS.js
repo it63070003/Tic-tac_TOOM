@@ -23,6 +23,8 @@ var trappedBlock = '';
 var spyBlock = '';
 
 var selectedBull = '';
+//Test for bull
+var deleteBull = false;
 
 for (block of blocks) {
     let blockId = block.id;
@@ -40,12 +42,12 @@ for (block of blocks) {
 
         if (shapeValue == 'E' && event.currentTarget.id == trappedBlock && !usingItem) {
             console.log("TRAPPED!!!!!");
-            let trapText = `<h1 class="ml4">
-                            Trapped
-                            </h1>`
-            let trapTextElem = document.createRange().createContextualFragment(trapText);
-            //event.currentTarget.appendChild(trapTextElem);
-            document.getElementById('table').appendChild(trapTextElem);
+            // let trapText = `<h1 class="ml4">
+            //                 Trapped
+            //                 </h1>`
+            // let trapTextElem = document.createRange().createContextualFragment(trapText);
+            // //event.currentTarget.appendChild(trapTextElem);
+            // document.getElementById('table').appendChild(trapTextElem);
 
             trappedBlock = '';
             randomItem() ? usingItem = true : endTurn();
@@ -74,6 +76,10 @@ for (block of blocks) {
             playerMove = event.currentTarget.id;
             updateMoveToEnemy(playerMove);
 
+            if (selectedBull != '') {
+                changeShape(selectedBull, 'E');
+                selectedBull = '';
+            }
             if (checkResult()) {
                 return true;
             }
@@ -106,6 +112,7 @@ for (block of blocks) {
             let bullPos = useBull(this);
             console.log("Moving bull");
             playerAction = { "item": 'bull', "pos": bullPos };
+            deleteBull = true;//delete bull if enemy place anything
             updateActionToEnemy(playerAction);
             if (checkResult()) {
                 return true;
@@ -120,6 +127,8 @@ function changeShape(pos, shape) {
 
     if (shape == 'E') {
         document.getElementById(pos).innerHTML = ``;
+    } else if (shape == 'B') {
+        document.getElementById(pos).innerHTML = `<img class="shapeImage" src="images/bull_block_icon.webp">`;
     } else {
         document.getElementById(pos).innerHTML = `<img class="shapeImage" src="images/${shape}_shape.webp">`;
     }
@@ -127,12 +136,11 @@ function changeShape(pos, shape) {
 }
 
 function randomItem() {
-    console.log('randomitem!');
-    //let itemIndex = Math.floor(Math.random() * 4);
-    let itemIndex = 4; //!!!!!!!!!Test item
+    let itemIndex = Math.floor(Math.random() * 4);
+    //let itemIndex = 4; //!!!!!!!!!Test item
 
     let itemsString = ['gun', 'trap', 'spy', 'bull', 'revolver']
-    let itemsImg = ['images/gun_icon.webp', 'images/trap_icon.webp', 'images/spy_icon.webp', 'images/bull_icon.webp', 'images/gun_icon.webp']
+    let itemsImg = ['images/gun_icon.webp', 'images/trap_icon.webp', 'images/spy_icon.webp', 'images/bull_icon.webp', 'images/gun_part_icon.webp']
     document.getElementById('currentItem').setAttribute('src', itemsImg[itemIndex]);
     return useItem(itemsString[itemIndex]);
 }
@@ -302,6 +310,7 @@ function useBull(shape) {
     let moveToPos = shape.id;
 
     destroyShape(selectPos);
+    changeShape(selectPos, 'B');
     changeShape(moveToPos, enemyShape);
 
     return [selectPos, moveToPos];
@@ -309,10 +318,10 @@ function useBull(shape) {
 
 function useRevolver() {
     let randomNum = getRandomInt(playerRevolverBullet);
-    let shotted = false;
+    let shotted = 'false';
     if (randomNum == playerRevolverBullet) {
         revolverWinner = playerShape;
-        shotted = true;
+        shotted = 'true';
     }
     else {
         playerRevolverBullet -= 1;
@@ -324,7 +333,7 @@ function useRevolver() {
 
     playerAction = { "item": 'revolver', "pos": shotted };
     updateActionToEnemy(playerAction);
-    console.log('parts: ', playerRevolverPart, 'bullet', playerRevolverBullet);
+    //console.log('Revolver parts: ', playerRevolverPart, 'bullet left: ', playerRevolverBullet, "chance to win:", (1/playerRevolverBullet)*100, '%');
 }
 
 function destroyShape(shapePos) {
@@ -413,6 +422,7 @@ function checkResult() {
         //Game end and someone wins the game
         winner = winShape;
         turnObject.innerHTML = "Game win by " + winner;
+        console.log("Game win by " + winner);
         game_continue = false;
         return true;
     } else if (draw_condition) {
@@ -452,29 +462,34 @@ function startTurn() {
 }
 
 function updateMoveToEnemy(playerMove) {
-    console.log("Player Move : " + playerMove + " Sended")
+    //console.log("Player Move : " + playerMove + " Sended")
 }
 
 function updateActionToEnemy(playerAction) {
-    console.log("Player Action : " + playerAction + " Sended")
+    //console.log("Player Action : " + playerAction + " Sended")
 }
 
 
 //ทดสอบอาจเอาออกทีหลัง
 function updateEnemyMove() {
     enemyMove = document.getElementById("enemyMovePos").value;
+    if (deleteBull) {
+        changeShape(selectedBull, 'E');
+        selectedBull = '';
+        deleteBull = false;
+    }
     changeShape(enemyMove, enemyShape);
-
     console.log(enemyMove)
 }
 
 function updateEnemyAction() {
     let enemyItem = document.getElementById("enemyActionItem").value;
     let enemyActionPos = document.getElementById("enemyActionPos").value;
+    let enemyActionPos2 = document.getElementById("enemyActionPos2").value;
     enemyAction = { "item": enemyItem, "pos": enemyActionPos };
 
     if (enemyItem == 'bull') {
-        enemyAction = { "item": enemyItem, "pos": ['A0', 'B1'] }
+        enemyAction = { "item": enemyItem, "pos": [enemyActionPos, enemyActionPos2] };
     }
 
     switch (enemyAction["item"]) {
@@ -510,6 +525,8 @@ function updateEnemyAction() {
     }
     function enemyBull(pos) {
         destroyShape(pos[0])
+        changeShape(pos[0], 'B');
+        selectedBull = pos[0];
         changeShape(pos[1], playerShape)
     }
     function enemyRevolver(shotted) {
@@ -521,7 +538,11 @@ function updateEnemyAction() {
             enemyRevolverPart += 1;
             //add part animation
         }
-        revolverWinner = enemyShape;
+
+        if (shotted == 'true') {
+            revolverWinner = enemyShape;
+        }
+
         checkResult();
     }
 

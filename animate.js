@@ -25,8 +25,8 @@ anime.timeline({loop: false})
     duration: 500,
     delay: 500
   });
-  setTimeout(testt, 3000);
+  // setTimeout(testt, 3000);
 
-  function testt(){
-    console.log('donnnnn')
-  }
+  // function testt(){
+  //   console.log('donnnnn')
+  // }
