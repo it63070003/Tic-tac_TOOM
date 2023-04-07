@@ -1,0 +1,86 @@
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Rye&display=swap" rel="stylesheet">
+</head>
+<style>
+    #board {
+        display: flex;
+        flex-wrap: wrap;
+        width: 300px;
+        height: 300px;
+    }
+
+    .square {
+        width: 100px;
+        height: 100px;
+        border: 1px solid black;
+    }
+
+    .trap {
+        background-color: red;
+        color: white;
+    }
+
+    #trapped-text {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        font-size: 4em;
+        font-weight: bold;
+        opacity: 0;
+        animation-duration: 2s;
+        animation-fill-mode: forwards;
+    }
+
+    @keyframes zoom-in {
+        0% {
+            transform: translate(-50%, -50%) scale(0);
+            opacity: 0;
+        }
+
+        50% {
+            transform: translate(-50%, -50%) scale(1.2);
+            opacity: 1;
+        }
+
+        100% {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 0;
+        }
+    }
+</style>
+
+<body>
+    <audio id="button-sound" src="audio/knife.wav"></audio>
+    </div>
+    <button id="my-button">Click me!</button>
+
+</body>
+<script>
+    document.getElementById("my-button").addEventListener("click", function () {
+        // Play the sound effect when the button is clicked
+        document.getElementById("button-sound").play();
+    });
+    const trapSquare = document.querySelector('.trap');
+    const trappedText = document.getElementById('trapped-text');
+
+    trapSquare.addEventListener('click', () => {
+        trappedText.style.display = 'block';
+        trappedText.style.animationName = 'zoom-in';
+        setTimeout(() => {
+            trappedText.style.display = 'none';
+            trappedText.style.animationName = '';
+        }, 2000);
+    });
+
+</script>
+
+</html>

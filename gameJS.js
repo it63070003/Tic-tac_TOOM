@@ -38,16 +38,17 @@ for (block of blocks) {
             return false;
         }
         let shapeValue = event.currentTarget.getAttribute('data-shape');
-        let action = event.currentTarget.getAttribute('data-action'); // "E", "gun-shoot", "trap-place", "spy-select", "spy-guess" ,"bull-select", "bull-move, revolver"
+        let action = event.currentTarget.getAttribute('data-action'); // "E", "knife-shoot", "trap-place", "spy-select", "spy-guess" ,"bull-select", "bull-move, revolver"
 
         if (shapeValue == 'E' && event.currentTarget.id == trappedBlock && !usingItem) {
-            console.log("TRAPPED!!!!!");
-            // let trapText = `<h1 class="ml4">
-            //                 Trapped
-            //                 </h1>`
-            // let trapTextElem = document.createRange().createContextualFragment(trapText);
-            // //event.currentTarget.appendChild(trapTextElem);
-            // document.getElementById('table').appendChild(trapTextElem);
+            const alert_Text = document.getElementById('alert-text');
+            alert_Text.innerHTML = "TRAPPED!";
+            alert_Text.style.display = 'block';
+            alert_Text.style.animationName = 'zoom-in';
+            setTimeout(() => {
+                alert_Text.style.display = 'none';
+                alert_Text.style.animationName = '';
+            }, 3500);
 
             trappedBlock = '';
             randomItem() ? usingItem = true : endTurn();
@@ -86,9 +87,9 @@ for (block of blocks) {
             //!!!!!!!!!!!TEST NO ENEMY SHOULD USE ITEM
             randomItem() ? usingItem = true : endTurn();
 
-        } else if (shapeValue != 'E' && action == "gun") {
-            let shootPos = useGun(this);
-            playerAction = { "item": 'gun', "pos": shootPos };
+        } else if (shapeValue != 'E' && action == "knife") {
+            let shootPos = useKnife(this);
+            playerAction = { "item": 'knife', "pos": shootPos };
             updateActionToEnemy(playerAction);
 
             endTurn();
@@ -128,26 +129,37 @@ function changeShape(pos, shape) {
     if (shape == 'E') {
         document.getElementById(pos).innerHTML = ``;
     } else if (shape == 'B') {
-        document.getElementById(pos).innerHTML = `<img class="shapeImage" src="images/bull_block_icon.webp">`;
+        document.getElementById(pos).innerHTML = `<img class="shapeImage" src="images/bull_block_icon.png">`;
+        document.getElementById(pos).firstChild.classList.add('fade-in-left');
+        setTimeout(() => {
+            document.getElementById(pos).firstChild.classList.remove('fade-in-left');
+        }, 1000);
     } else {
-        document.getElementById(pos).innerHTML = `<img class="shapeImage" src="images/${shape}_shape.webp">`;
+        document.getElementById(pos).innerHTML = `<img class="shapeImage" src="images/${shape}_shape.png">`;
     }
 
 }
 
 function randomItem() {
-    let itemIndex = Math.floor(Math.random() * 4);
-    //let itemIndex = 4; //!!!!!!!!!Test item
+    //let itemIndex = Math.floor(Math.random() * 4);
+    let itemIndex = 3; //!!!!!!!!!Test item
 
-    let itemsString = ['gun', 'trap', 'spy', 'bull', 'revolver']
-    let itemsImg = ['images/gun_icon.webp', 'images/trap_icon.webp', 'images/spy_icon.webp', 'images/bull_icon.webp', 'images/gun_part_icon.webp']
-    document.getElementById('currentItem').setAttribute('src', itemsImg[itemIndex]);
-    return useItem(itemsString[itemIndex]);
+    let currentItem = document.getElementById('currentItem-image');
+    let itemsString = ['knife', 'trap', 'spy', 'bull', 'revolver']
+    let itemsImg = ['images/knife_icon.png', 'images/trap_icon.png', 'images/spy_icon.png', 'images/bull_icon.png', 'images/gun_part_icon.webp']
+
+    currentItem.src = itemsImg[itemIndex];
+    currentItem.style.display = 'block';
+    currentItem.classList.add('flip');
+    setTimeout(() => {
+        currentItem.classList.remove('flip');
+    }, 1000);
+    return useItem(itemsString[itemIndex])
 }
 function useItem(item) {
     switch (item) {
-        case 'gun':
-            return checkGun();
+        case 'knife':
+            return checkKnife();
             break;
         case 'trap':
             // code block
@@ -173,7 +185,7 @@ function useItem(item) {
     }
 }
 
-function checkGun() {
+function checkKnife() {
     let usable = false;
     for (block of blocks) {
         if (block.getAttribute('data-shape') == playerShape) {
@@ -193,7 +205,7 @@ function checkGun() {
     function checkBlock(thatBlock) {
         try {
             if (thatBlock.getAttribute('data-shape') == enemyShape) {
-                thatBlock.setAttribute('data-action', 'gun');
+                thatBlock.setAttribute('data-action', 'knife');
                 thatBlock.style.backgroundColor = 'red';
                 usable = true;
             }
@@ -289,7 +301,7 @@ function checkRevolver() {
     }
 }
 
-function useGun(shape) {
+function useKnife(shape) {
     let shapePos = shape.id;
     destroyShape(shapePos);
     return shapePos;
@@ -434,6 +446,14 @@ function checkResult() {
 }
 
 function endTurn() {
+    let currentItem = document.getElementById("currentItem-image");
+    currentItem.classList.add("bounce-out-down");
+    setTimeout(() => {
+        currentItem.classList.remove('bounce-out-down');
+        currentItem.style.display = 'none';
+    }, 1000);
+
+
     turn = turn === 'O' ? 'X' : 'O';
     turnObject.innerHTML = "Turn: " + turn;
     usingItem = false;
@@ -449,12 +469,21 @@ function endTurn() {
 function startTurn() {
     turn = turn === 'O' ? 'X' : 'O';
     turnObject.innerHTML = "Turn: " + turn;
-
     for (block of blocks) {
         if (spyBlock != '' && block.getAttribute('data-shape') == playerShape) {
             block.setAttribute('data-action', 'spy-guess');
             block.style.backgroundColor = 'purple';
         }
+    }
+    if(spyBlock != ''){
+        let alert_Text = document.getElementById('alert-text');
+        alert_Text.innerHTML = "SPY FIND HIM!";
+        alert_Text.style.display = 'block';
+        alert_Text.style.animationName = 'zoom-in';
+        setTimeout(() => {
+            alert_Text.style.display = 'none';
+            alert_Text.style.animationName = '';
+        }, 3500);
     }
     if (checkResult()) {
         return true;
@@ -493,8 +522,8 @@ function updateEnemyAction() {
     }
 
     switch (enemyAction["item"]) {
-        case 'gun':
-            enemyGun(enemyAction["pos"]);
+        case 'knife':
+            enemyKnife(enemyAction["pos"]);
             break;
         case 'trap':
             enemyTrap(enemyAction["pos"]);
@@ -514,7 +543,7 @@ function updateEnemyAction() {
 
     startTurn();
 
-    function enemyGun(pos) {
+    function enemyKnife(pos) {
         destroyShape(pos);
     }
     function enemyTrap(pos) {
