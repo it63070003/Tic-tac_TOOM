@@ -1,3 +1,44 @@
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics.js";
+import { getDatabase, ref, onValue, update, get, set, push } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyC0KXbQP2TRfHS544PCO0Lyuykyy8smk3s",
+    authDomain: "tictactoom-420xd.firebaseapp.com",
+    databaseURL: "https://tictactoom-420xd-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "tictactoom-420xd",
+    storageBucket: "tictactoom-420xd.appspot.com",
+    messagingSenderId: "713753276707",
+    appId: "1:713753276707:web:7b21e628d8380a680ddc96",
+    measurementId: "G-QTPBT2T1H2"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const database = getDatabase(app);
+const auth = getAuth();
+const gameRef = ref(database, "Game");
+//const publicGameRef = ref(database, "Game/publicGame");
+
+var playerID = '';
+var enemyID = '';
+onAuthStateChanged(auth, user => {
+    let userId = auth.currentUser.uid;
+    playerID = userId;
+    onValue(ref(database, 'Users/' + userId + '/name'), (snapshot) => {
+        var data = snapshot.val();
+    });
+});
+
+const myUserRef = ref(database, "Users/" + playerID + "/");
+var currentGameID = "";
+var roomType = '';
+var currentGameRef = '';
+
+
+//Game js VAR
 var turn = 'O';
 var playerShape = 'O';
 var enemyShape = 'X';
@@ -26,7 +67,56 @@ var selectedBull = '';
 //Test for bull
 var deleteBull = false;
 
-for (block of blocks) {
+var playerName = '';
+var enemyName = '';
+
+setupGame();
+function setupGame() {
+    get(myUserRef).then((snapshot) => {
+        console.log(snapshot.val()[playerID]["currentGame"]);
+        playerName = snapshot.val()[playerID]["name"];
+        currentGameID = snapshot.val()[playerID]["currentGame"]["roomID"];
+        roomType = snapshot.val()[playerID]["currentGame"]["roomType"];
+        console.log("currentGame: " + currentGameID);
+        console.log("This is roomtype", roomType);
+        currentGameRef = ref(database, `Game/${roomType}Game/${currentGameID}/`);
+        document.getElementById("playerName").innerText = ""
+        getEnemyInfo();
+    });
+
+    function getEnemyInfo() {
+        get(currentGameRef).then((snapshot) => {
+            console.log("Snappy: ", snapshot.val());
+            if (snapshot.val()["player1"]["UID"] != playerID) {
+                enemyID = snapshot.val()["player1"]["UID"];
+                enemyShape = snapshot.val()["player1"]["shape"];
+            }
+            else {
+                enemyID = snapshot.val()["player2"]["UID"];
+                enemyShape = snapshot.val()["player2"]["shape"]
+            }
+            console.log("enemyID: " + enemyID);
+            console.log("enemyShape: " + enemyShape);
+            getEnemyName();
+        });
+    }
+
+    function getEnemyName(){
+        get(ref(database, `Users/${enemyID}`)).then((snapshot)=>{
+            enemyName = snapshot.val()["name"];
+            displayName();
+        });
+    }
+
+    function displayName() {
+        document.getElementById("playerName").innerText = playerName;
+        document.getElementById("enemyName").innerText = enemyName
+    }
+
+}
+
+// GAMEGAMEGAMEGAMEGAMEGAMEGAMEGAMEGAMEGAMEGAMEGAMEGAMEGAMEGAMEGAMEGAMEGAMEGAMEGAMEGAMEGAMEGAMEGAMEGAMEGAMEGAMEGAME
+for (let block of blocks) {
     let blockId = block.id;
     block.addEventListener('click', function (event) {
         // modify the condition here to continue the game play as long as there is no winner
@@ -64,7 +154,7 @@ for (block of blocks) {
                 }
             }
 
-            for (block of blocks) {
+            for (let block of blocks) {
                 block.setAttribute('data-action', 'E');
                 block.style.backgroundColor = 'white';
             }
@@ -141,8 +231,8 @@ function changeShape(pos, shape) {
 }
 
 function randomItem() {
-    //let itemIndex = Math.floor(Math.random() * 4);
-    let itemIndex = 3; //!!!!!!!!!Test item
+    let itemIndex = Math.floor(Math.random() * 4);
+    //let itemIndex = 3; //!!!!!!!!!Test item
 
     let currentItem = document.getElementById('currentItem-image');
     let itemsString = ['knife', 'trap', 'spy', 'bull', 'revolver']
@@ -187,7 +277,7 @@ function useItem(item) {
 
 function checkKnife() {
     let usable = false;
-    for (block of blocks) {
+    for (let block of blocks) {
         if (block.getAttribute('data-shape') == playerShape) {
             // block = B2  Check B1 A2 B3 C2
             let blockPos = block.getAttribute('id')
@@ -217,7 +307,7 @@ function checkKnife() {
 
 function checkTrap() {
     let usable = false;
-    for (block of blocks) {
+    for (let block of blocks) {
         if (block.getAttribute('data-shape') == 'E') {
             block.setAttribute('data-action', 'trap');
             block.style.backgroundColor = 'pink';
@@ -229,7 +319,7 @@ function checkTrap() {
 
 function checkSpy() {
     let usable = false;
-    for (block of blocks) {
+    for (let block of blocks) {
         if (block.getAttribute('data-shape') == enemyShape) {
             block.setAttribute('data-action', 'spy-select');
             block.style.backgroundColor = 'orange';
@@ -241,7 +331,7 @@ function checkSpy() {
 
 function checkBullSelect() {
     let usable = false;
-    for (block of blocks) {
+    for (let block of blocks) {
         if (block.getAttribute('data-shape') == enemyShape) {
             // block = B2  Check B1 A2 B3 C2
             let blockPos = block.getAttribute('id')
@@ -354,7 +444,7 @@ function destroyShape(shapePos) {
 }
 
 function boardClean() {
-    for (block of blocks) {
+    for (let block of blocks) {
         block.setAttribute('data-action', 'E');
         block.style.backgroundColor = 'white';
     }
@@ -376,7 +466,8 @@ function checkResult() {
 
     function checkWinCondition() {
 
-        for (alpha of ['A', 'B', 'C', 'D']) {
+
+        for (let alpha of ['A', 'B', 'C', 'D']) {
             let el1 = document.getElementById(alpha + "0").getAttribute('data-shape');
             let el2 = document.getElementById(alpha + "1").getAttribute('data-shape');
             let el3 = document.getElementById(alpha + "2").getAttribute('data-shape');
@@ -388,7 +479,7 @@ function checkResult() {
             }
         }
 
-        for (numer of ['0', '1', '2', '3']) {
+        for (let numer of ['0', '1', '2', '3']) {
             let el1 = document.getElementById('A' + numer).getAttribute('data-shape');
             let el2 = document.getElementById('B' + numer).getAttribute('data-shape');
             let el3 = document.getElementById('C' + numer).getAttribute('data-shape');
@@ -400,10 +491,10 @@ function checkResult() {
             }
         }
 
-        el1 = document.getElementById('A0').getAttribute('data-shape');
-        el2 = document.getElementById('B1').getAttribute('data-shape');
-        el3 = document.getElementById('C2').getAttribute('data-shape');
-        el4 = document.getElementById('D3').getAttribute('data-shape');
+        let el1 = document.getElementById('A0').getAttribute('data-shape');
+        let el2 = document.getElementById('B1').getAttribute('data-shape');
+        let el3 = document.getElementById('C2').getAttribute('data-shape');
+        let el4 = document.getElementById('D3').getAttribute('data-shape');
         if ((el1 == el2 && el2 == el3 && el3 == el4) && el1 != 'E') {
             winShape = el1;
             return true;
@@ -422,7 +513,7 @@ function checkResult() {
     }
 
     function checkDrawCondition() {
-        for (block of blocks) {
+        for (let block of blocks) {
             if (block.getAttribute('data-shape') == 'E') {
                 return false;
             }
@@ -469,13 +560,13 @@ function endTurn() {
 function startTurn() {
     turn = turn === 'O' ? 'X' : 'O';
     turnObject.innerHTML = "Turn: " + turn;
-    for (block of blocks) {
+    for (let block of blocks) {
         if (spyBlock != '' && block.getAttribute('data-shape') == playerShape) {
             block.setAttribute('data-action', 'spy-guess');
             block.style.backgroundColor = 'purple';
         }
     }
-    if(spyBlock != ''){
+    if (spyBlock != '') {
         let alert_Text = document.getElementById('alert-text');
         alert_Text.innerHTML = "SPY FIND HIM!";
         alert_Text.style.display = 'block';
