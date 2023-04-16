@@ -58,10 +58,21 @@ var playerRevolverPart = 0;
 var playerRevolverBullet = 6;
 var enemyRevolverPart = 0;
 var enemyRevolverBullet = 6;
+var shootAmount = 0;
 var revolverWinner = '';
 
 var trappedBlock = '';
-var spyBlock = '';
+var spyBlock = ''; //["X", "A0"]  เดา update["OR", "A0"] do nothing เดา update["OW", "A0"] 
+//เดาถูก 
+
+//เดาผิด
+//onvale ดูค่า spy 
+/*{
+    [x, a0]:
+    changeShape x, a0
+}
+  
+ */
 
 var selectedBull = '';
 //Test for bull
@@ -73,38 +84,42 @@ var enemyName = '';
 setupGame();
 function setupGame() {
     get(myUserRef).then((snapshot) => {
-        console.log(snapshot.val()[playerID]["currentGame"]);
+        //console.log(snapshot.val()[playerID]["currentGame"]);
         playerName = snapshot.val()[playerID]["name"];
         currentGameID = snapshot.val()[playerID]["currentGame"]["roomID"];
         roomType = snapshot.val()[playerID]["currentGame"]["roomType"];
-        console.log("currentGame: " + currentGameID);
-        console.log("This is roomtype", roomType);
+        //console.log("currentGame: " + currentGameID);
+        //console.log("This is roomtype", roomType);
         currentGameRef = ref(database, `Game/${roomType}Game/${currentGameID}/`);
         document.getElementById("playerName").innerText = ""
         getEnemyInfo();
+        eventTick();
     });
 
     function getEnemyInfo() {
         get(currentGameRef).then((snapshot) => {
-            console.log("Snappy: ", snapshot.val());
+            //console.log("Snappy: ", snapshot.val());
             if (snapshot.val()["player1"]["UID"] != playerID) {
                 enemyID = snapshot.val()["player1"]["UID"];
                 enemyShape = snapshot.val()["player1"]["shape"];
+                playerShape = snapshot.val()["player2"]["shape"];
             }
             else {
                 enemyID = snapshot.val()["player2"]["UID"];
                 enemyShape = snapshot.val()["player2"]["shape"]
+                playerShape = snapshot.val()["player1"]["shape"];
             }
-            console.log("enemyID: " + enemyID);
-            console.log("enemyShape: " + enemyShape);
+            //console.log("enemyID: " + enemyID);
+            //console.log("enemyShape: " + enemyShape);
             getEnemyName();
         });
     }
 
-    function getEnemyName(){
-        get(ref(database, `Users/${enemyID}`)).then((snapshot)=>{
+    function getEnemyName() {
+        get(ref(database, `Users/${enemyID}`)).then((snapshot) => {
             enemyName = snapshot.val()["name"];
             displayName();
+            setUpLoseTheGame();
         });
     }
 
@@ -129,7 +144,7 @@ for (let block of blocks) {
         }
         let shapeValue = event.currentTarget.getAttribute('data-shape');
         let action = event.currentTarget.getAttribute('data-action'); // "E", "knife-shoot", "trap-place", "spy-select", "spy-guess" ,"bull-select", "bull-move, revolver"
-
+        //จะกดแต่มี trap แกไม่รอดแน่
         if (shapeValue == 'E' && event.currentTarget.id == trappedBlock && !usingItem) {
             const alert_Text = document.getElementById('alert-text');
             alert_Text.innerHTML = "TRAPPED!";
@@ -141,14 +156,23 @@ for (let block of blocks) {
             }, 3500);
 
             trappedBlock = '';
-            randomItem() ? usingItem = true : endTurn();
-        } else if (shapeValue == playerShape && action == "spy-guess" && !usingItem) {
-            if (event.currentTarget.id == spyBlock) {
-                console.log("Spy guess Sucess");
+            //randomItem() ? usingItem = true : endTurn();
+            if (randomItem()) {
+                usingItem = true;
             }
             else {
-                console.log("Spy kill your shape And Disguised");
+                playerAction = { "item": '', "pos": ['', ''] };
+                updateActionToEnemy(playerAction);
+                endTurn();
+            }
+        } else if (shapeValue == playerShape && action == "spy-guess" && !usingItem) {
+            if (event.currentTarget.id == spyBlock) {
+                //console.log("Spy guess Sucess");
+            }
+            else {
+                //console.log("Spy kill your shape And Disguised");
                 changeShape(spyBlock, enemyShape);
+                updateSpyToEnemy(spyBlock, enemyShape);
                 if (checkResult()) {
                     return true;
                 }
@@ -175,7 +199,15 @@ for (let block of blocks) {
                 return true;
             }
             //!!!!!!!!!!!TEST NO ENEMY SHOULD USE ITEM
-            randomItem() ? usingItem = true : endTurn();
+            //randomItem() ? usingItem = true : endTurn();
+            if (randomItem()) {
+                usingItem = true;
+            }
+            else {
+                playerAction = { "item": '', "pos": ['', ''] };
+                updateActionToEnemy(playerAction);
+                endTurn();
+            }
 
         } else if (shapeValue != 'E' && action == "knife") {
             let shootPos = useKnife(this);
@@ -192,6 +224,7 @@ for (let block of blocks) {
         } else if (shapeValue == enemyShape && action == "spy-select") {
             let spyPos = useSpy(this);
             playerAction = { "item": 'spy', "pos": spyPos };
+            //update(database `asdasdasdsad`, {spy:[`${playerShape}`, ]})
             updateActionToEnemy(playerAction);
 
             endTurn();
@@ -201,7 +234,7 @@ for (let block of blocks) {
             selectedBull = checkBullMove(this);
         } else if (shapeValue == 'E' && action == "bull-move") {
             let bullPos = useBull(this);
-            console.log("Moving bull");
+            //console.log("Moving bull");
             playerAction = { "item": 'bull', "pos": bullPos };
             deleteBull = true;//delete bull if enemy place anything
             updateActionToEnemy(playerAction);
@@ -231,8 +264,9 @@ function changeShape(pos, shape) {
 }
 
 function randomItem() {
-    let itemIndex = Math.floor(Math.random() * 4);
-    //let itemIndex = 3; //!!!!!!!!!Test item
+    //console.log("Randoming item");
+    let itemIndex = Math.floor(Math.random() * 5);
+    //let itemIndex = 4; //!!!!!!!!!Test item
 
     let currentItem = document.getElementById('currentItem-image');
     let itemsString = ['knife', 'trap', 'spy', 'bull', 'revolver']
@@ -244,7 +278,7 @@ function randomItem() {
     setTimeout(() => {
         currentItem.classList.remove('flip');
     }, 1000);
-    return useItem(itemsString[itemIndex])
+    return useItem(itemsString[itemIndex]);
 }
 function useItem(item) {
     switch (item) {
@@ -262,11 +296,14 @@ function useItem(item) {
             return checkBullSelect();
             break;
         case 'revolver':
+            //console.log("Player Revolver Part:" + playerRevolverPart);
+            //วาง 1 k=0 k=1 วาง 2 k=1 k=2 วาง 3 k=2 else k=3
             if (playerRevolverPart == 3) {
-                useRevolver();
+                shootAmount++;
             }
             else {
                 playerRevolverPart += 1;
+                updateActionToRevolver('');
             }
             return false;
             break;
@@ -362,7 +399,7 @@ function checkBullSelect() {
 function checkBullMove(block) {
     if (block.getAttribute('data-shape') == enemyShape) {
         // block = B2  Check B1 A2 B3 C2
-        let blockPos = block.getAttribute('id')
+        let blockPos = block.getAttribute('id');
         let upLeftBlock = document.getElementById(String.fromCharCode(blockPos[0].charCodeAt(0) - 1) + (parseInt(blockPos[1]) - 1).toString());
         let upRightBlock = document.getElementById(String.fromCharCode(blockPos[0].charCodeAt(0) - 1) + (parseInt(blockPos[1]) + 1).toString());
         let downLeftBlock = document.getElementById(String.fromCharCode(blockPos[0].charCodeAt(0) + 1) + (parseInt(blockPos[1]) - 1).toString());
@@ -387,6 +424,7 @@ function checkBullMove(block) {
 
 function checkRevolver() {
     if (playerRevolverPart >= 3) {
+        shootAmount++;
         useRevolver();
     }
 }
@@ -419,23 +457,27 @@ function useBull(shape) {
 }
 
 function useRevolver() {
-    let randomNum = getRandomInt(playerRevolverBullet);
-    let shotted = 'false';
-    if (randomNum == playerRevolverBullet) {
-        revolverWinner = playerShape;
-        shotted = 'true';
+    let shotted = '';
+    let randomNum = 0;
+    for (let i = 0; i < shootAmount; i++) {
+        
+        randomNum = getRandomInt(playerRevolverBullet);
+        if (randomNum == playerRevolverBullet) {
+            revolverWinner = playerShape;
+            shotted = playerShape;
+        }
+        else {
+            playerRevolverBullet -= 1;
+        }
+        console.log('Revolver parts: ', playerRevolverPart, 'bullet left: ', playerRevolverBullet, "chance to win:", (1 / playerRevolverBullet) * 100, '%');
     }
-    else {
-        playerRevolverBullet -= 1;
-    }
+    shootAmount = 0;
 
     function getRandomInt(max) {
         return Math.floor(Math.random() * max) + 1;
     }
 
-    playerAction = { "item": 'revolver', "pos": shotted };
-    updateActionToEnemy(playerAction);
-    //console.log('Revolver parts: ', playerRevolverPart, 'bullet left: ', playerRevolverBullet, "chance to win:", (1/playerRevolverBullet)*100, '%');
+    updateActionToRevolver(shotted);
 }
 
 function destroyShape(shapePos) {
@@ -527,16 +569,20 @@ function checkResult() {
         turnObject.innerHTML = "Game win by " + winner;
         console.log("Game win by " + winner);
         game_continue = false;
+        setTimeout(destroyRoom, 3000);
         return true;
     } else if (draw_condition) {
         // Game end and no-one wins the game
         turnObject.innerHTML = "Game draw";
         game_continue = false;
+        setTimeout(destroyRoom, 3000);
         return true;
+        
     }
 }
 
 function endTurn() {
+    //console.log("endturn");
     let currentItem = document.getElementById("currentItem-image");
     currentItem.classList.add("bounce-out-down");
     setTimeout(() => {
@@ -555,9 +601,12 @@ function endTurn() {
     checkRevolver();
     checkResult();
     //startTurn();//อีกฝ่าย
+    // update(currentGameRef, {"turn":turn});
+    // console.log("Turn Ended and Update");
 }
 
 function startTurn() {
+    console.log("Start Turn");
     turn = turn === 'O' ? 'X' : 'O';
     turnObject.innerHTML = "Turn: " + turn;
     for (let block of blocks) {
@@ -583,34 +632,48 @@ function startTurn() {
 
 function updateMoveToEnemy(playerMove) {
     //console.log("Player Move : " + playerMove + " Sended")
+    update(ref(database, `Game/${roomType}Game/${currentGameID}`), { "move": [playerShape, playerMove] });
 }
 
 function updateActionToEnemy(playerAction) {
     //console.log("Player Action : " + playerAction + " Sended")
+    update(ref(database, `Game/${roomType}Game/${currentGameID}`), { "action": [playerShape, playerAction] });
+}
+
+function updateActionToRevolver(shotted) {
+    let playerRevolverInfo = { "Opart": 0, "Xpart": 0, "win": "" };
+    if (playerShape == 'O') {
+        playerRevolverInfo = { "Opart": playerRevolverPart, "Xpart": enemyRevolverPart, "win": shotted };
+    }
+    else {
+        playerRevolverInfo = { "Opart": enemyRevolverPart, "Xpart": playerRevolverPart, "win": shotted };
+    }
+    update(ref(database, `Game/${roomType}Game/${currentGameID}`), { "revolver": playerRevolverInfo });
 }
 
 
 //ทดสอบอาจเอาออกทีหลัง
 function updateEnemyMove() {
-    enemyMove = document.getElementById("enemyMovePos").value;
+    //enemyMove = document.getElementById("enemyMovePos").value;
     if (deleteBull) {
         changeShape(selectedBull, 'E');
         selectedBull = '';
         deleteBull = false;
     }
     changeShape(enemyMove, enemyShape);
-    console.log(enemyMove)
+    checkResult();
+    //console.log(enemyMove)
 }
 
 function updateEnemyAction() {
-    let enemyItem = document.getElementById("enemyActionItem").value;
-    let enemyActionPos = document.getElementById("enemyActionPos").value;
-    let enemyActionPos2 = document.getElementById("enemyActionPos2").value;
-    enemyAction = { "item": enemyItem, "pos": enemyActionPos };
+    // let enemyItem = document.getElementById("enemyActionItem").value;
+    // let enemyActionPos = document.getElementById("enemyActionPos").value;
+    // let enemyActionPos2 = document.getElementById("enemyActionPos2").value;
+    //enemyAction = { "item": enemyItem, "pos": enemyActionPos };
 
-    if (enemyItem == 'bull') {
-        enemyAction = { "item": enemyItem, "pos": [enemyActionPos, enemyActionPos2] };
-    }
+    // if (enemyItem == 'bull') {
+    //     enemyAction = { "item": enemyItem, "pos": [enemyActionPos, enemyActionPos2] };
+    // }
 
     switch (enemyAction["item"]) {
         case 'knife':
@@ -649,23 +712,93 @@ function updateEnemyAction() {
         selectedBull = pos[0];
         changeShape(pos[1], playerShape)
     }
-    function enemyRevolver(shotted) {
-        //enemyShoot animation
-        if (enemyRevolverPart == 3) {
-            //animation
-        }
-        else {
-            enemyRevolverPart += 1;
-            //add part animation
-        }
+    // function enemyRevolver(shotted) {
+    //     //enemyShoot animation
+    //     if (enemyRevolverPart == 3) {
+    //         //animation
+    //     }
+    //     else {
+    //         enemyRevolverPart += 1;
+    //         //add part animation
+    //     }
 
-        if (shotted == 'true') {
-            revolverWinner = enemyShape;
-        }
+    //     if (shotted == 'true') {
+    //         revolverWinner = enemyShape;
+    //     }
 
-        checkResult();
-    }
+    //     checkResult();
+    // }
 
 }
 
+function updateSpyToEnemy(pos, shape) {
+    update(ref(database, `Game/${roomType}Game/${currentGameID}`), { "spy": [pos, shape] });
+}
+
 // animation
+
+//test system bruuu
+document.querySelector("#updateEnemyMove").addEventListener('click', updateEnemyMove);
+document.querySelector("#updateEnemyAction").addEventListener('click', updateEnemyAction);
+
+//Firebase Functionsss
+
+function eventTick() {
+    const moveRef = ref(database, `Game/${roomType}Game/${currentGameID}/move`);
+    const actionRef = ref(database, `Game/${roomType}Game/${currentGameID}/action`);
+    const spyRef = ref(database, `Game/${roomType}Game/${currentGameID}/spy`);
+    const revolverRef = ref(database, `Game/${roomType}Game/${currentGameID}/revolver`);
+    onValue(moveRef, (snapshot) => {
+        //EnemyStartTomove
+        let move = snapshot.val();
+        if (move[0] == enemyShape) {
+            enemyMove = move[1];
+            updateEnemyMove();
+        }
+        //console.log("Move: " + move);
+    })
+    onValue(actionRef, (snapshot) => {
+        //EnemyTakeAction
+        let action = snapshot.val();
+        if (action[0] == enemyShape) {
+            //console.log("Got action")
+            enemyAction = action[1];
+            updateEnemyAction();
+        }
+    })
+    onValue(spyRef, (snapshot) => {
+        //Spy ['A0', 'X']
+        let spyAt = snapshot.val();
+        if (spyAt[0] != '') {
+            changeShape(spyAt[0], spyAt[1]);
+            checkResult();
+        }
+    })
+    onValue(revolverRef, (snapshot) => {
+        playerRevolverPart = snapshot.val()[`${playerShape}part`];
+        enemyRevolverPart = snapshot.val()[`${enemyShape}part`];
+        //update revolver UI
+
+
+        revolverWinner = snapshot.val()["win"];
+        checkResult();
+    })
+
+}
+
+function setUpLoseTheGame(){
+    window.addEventListener('beforeunload', loseTheGame);
+}
+
+
+function loseTheGame(){
+    console.log("Unload!");
+    updateActionToRevolver(enemyShape);
+}
+
+
+function destroyRoom() {
+    window.removeEventListener('beforeunload', loseTheGame);
+    set(ref(database, `Game/${roomType}Game/${currentGameID}`), null);
+    window.location = '/menu.html';
+}

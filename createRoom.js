@@ -78,7 +78,11 @@ function createPublicRoom() {
     shape == 1 ? shape = 'X' : shape = 'O';
     gameInfo = {
         "player1": { "UID": currentUserID, "shape": shape},//CurentUser
-        "player2": { "UID": '', "shape": ''}
+        "player2": { "UID": '', "shape": ''},
+        "move": ['', ''],
+        "action": ['', {"item": '', "pos": ['', ''] }],
+        "spy":["", ""],
+        "revolver":{"Opart":0, "Xpart":0, "win":""}
     };
     roomKey = push(publicGameRef, gameInfo).key;
     roomType = "public";
@@ -105,7 +109,7 @@ onValue(roomRef, (snapshot) => {
             //startgame
             console.log("start Game");
             //get(ref(database, `Users`)).then((snapshot)=>console.log(snapshot.val()[player2]));
-            //window.location = "/game.html";
+            window.location = "/game.html";
         }
     }
     catch (err) {
