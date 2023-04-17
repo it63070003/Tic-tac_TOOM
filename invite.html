@@ -81,20 +81,14 @@
         font-size: 2em;
         text-align: center;
     }
-
-    #gobackBtn{
-        cursor: pointer;
-    }
 </style>
 
 <body>
     <div class="playbox">
-        Searching for other player...
+        <input id="invitedUser" type="text" placeholder="insert player name">
+        <button id="inviteBtn">Send Invite</button><button id="gobackBtn">Go Back</button>
     </div>
-    <div id="gobackBtn">
-        Cancel
-    </div>
+    <!-- <h1 id="nickname">Nickname</h1> -->
 </body>
 <script type="module" src="createRoom.js"></script>
-
 </html>

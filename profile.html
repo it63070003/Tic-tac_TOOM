@@ -72,14 +72,14 @@
             <p id="Win" class="formlabel" for="Win">Win:</p><br>
             <p id="Lose" class="formlabel" for="Lose">Lose:</p><br>
             <p id="Winrate" class="formlabel" for="Winrate">Winrate:</p><br>
-            <input id="confirm" class="Confirmbox" type="button" value="Confirm">
+            <input id="confirm" class="Confirmbox" type="button" value="Change Name">
         </form>
     </div>
 </body>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics.js";
-    import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+    import { getDatabase, ref, onValue, set, update, get} from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
 
     // Your web app's Firebase configuration
@@ -141,7 +141,20 @@
     var confirmBtn = document.getElementById('confirm')
     confirmBtn.addEventListener('click', (e) => {
         let newName = document.getElementById('Nickname').value;
-        set(ref(database, 'Users/' + userId + '/name'), newName);
+        get(ref (database, 'Users')).then((snapshot)=>{
+            let nameDupe = false;
+            snapshot.forEach((user)=>{
+                if(newName.toLowerCase() == user.val()["name"].toLowerCase()){
+                    nameDupe = true;
+                }
+            });
+            if(nameDupe){
+                alert("This Name is already been used");
+            }else{
+                set(ref(database, 'Users/' + userId + '/name'), newName);
+            }
+        });
+        
     });
 
 

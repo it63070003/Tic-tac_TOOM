@@ -36,6 +36,7 @@ const myUserRef = ref(database, "Users/" + playerID + "/");
 var currentGameID = "";
 var roomType = '';
 var currentGameRef = '';
+var loaded = false;
 
 
 //Game js VAR
@@ -80,12 +81,24 @@ var deleteBull = false;
 
 var playerName = '';
 var enemyName = '';
+var playerWinAmount = 0;
+var enemyWinAmount = 0;
+var playerLoseAmount = 0;
+var enemyLoseAmount = 0;
+var playerTotalAmount = 0;
+var enemyTotalAmount = 0;
 
 setupGame();
 function setupGame() {
     get(myUserRef).then((snapshot) => {
         //console.log(snapshot.val()[playerID]["currentGame"]);
         playerName = snapshot.val()[playerID]["name"];
+        if (snapshot.val()[playerID]["currentGame"] == '') {
+            window.location = '/menu.html';
+        }
+        playerTotalAmount = snapshot.val()[playerID]["total"];
+        playerWinAmount = snapshot.val()[playerID]["win"];
+        playerLoseAmount = snapshot.val()[playerID]["lose"];
         currentGameID = snapshot.val()[playerID]["currentGame"]["roomID"];
         roomType = snapshot.val()[playerID]["currentGame"]["roomType"];
         //console.log("currentGame: " + currentGameID);
@@ -109,6 +122,13 @@ function setupGame() {
                 enemyShape = snapshot.val()["player2"]["shape"]
                 playerShape = snapshot.val()["player1"]["shape"];
             }
+            
+            if(playerShape == "O"){
+                document.getElementById("turn").innerText = `Your Turn`;
+            }
+            else{
+                document.getElementById("turn").innerText = `Waiting For Enemy...`;
+            }
             //console.log("enemyID: " + enemyID);
             //console.log("enemyShape: " + enemyShape);
             getEnemyName();
@@ -118,8 +138,12 @@ function setupGame() {
     function getEnemyName() {
         get(ref(database, `Users/${enemyID}`)).then((snapshot) => {
             enemyName = snapshot.val()["name"];
+            enemyTotalAmount = snapshot.val()["total"];
+            enemyWinAmount = snapshot.val()["win"];
+            enemyLoseAmount = snapshot.val()["lose"];
             displayName();
             setUpLoseTheGame();
+            loaded = true;
         });
     }
 
@@ -258,7 +282,7 @@ function changeShape(pos, shape) {
             document.getElementById(pos).firstChild.classList.remove('fade-in-left');
         }, 1000);
     } else {
-        document.getElementById(pos).innerHTML = `<img class="shapeImage" src="images/${shape}_shape.png">`;
+        document.getElementById(pos).innerHTML = `<img class="shapeImage" src="images/${shape}_shape.webp">`;
     }
 
 }
@@ -266,7 +290,10 @@ function changeShape(pos, shape) {
 function randomItem() {
     //console.log("Randoming item");
     let itemIndex = Math.floor(Math.random() * 5);
-    //let itemIndex = 4; //!!!!!!!!!Test item
+    // let itemIndex = Math.floor(Math.random() * 2);
+    // let itemArray = [1, 3];
+    // itemIndex = itemArray[itemIndex];
+    //let itemIndex = 1; //!!!!!!!!!Test item
 
     let currentItem = document.getElementById('currentItem-image');
     let itemsString = ['knife', 'trap', 'spy', 'bull', 'revolver']
@@ -460,7 +487,7 @@ function useRevolver() {
     let shotted = '';
     let randomNum = 0;
     for (let i = 0; i < shootAmount; i++) {
-        
+
         randomNum = getRandomInt(playerRevolverBullet);
         if (randomNum == playerRevolverBullet) {
             revolverWinner = playerShape;
@@ -490,6 +517,7 @@ function boardClean() {
         block.setAttribute('data-action', 'E');
         block.style.backgroundColor = 'white';
     }
+    trappedBlock = '';
 }
 
 function checkResult() {
@@ -577,7 +605,7 @@ function checkResult() {
         game_continue = false;
         setTimeout(destroyRoom, 3000);
         return true;
-        
+
     }
 }
 
@@ -592,7 +620,12 @@ function endTurn() {
 
 
     turn = turn === 'O' ? 'X' : 'O';
-    turnObject.innerHTML = "Turn: " + turn;
+    if(turn == playerShape){
+        turnObject.innerHTML = "Your Turn";
+    }
+    else{
+        turnObject.innerHTML = "Waiting For Enemy...";
+    }
     usingItem = false;
 
     //reset data-action, BG
@@ -608,7 +641,13 @@ function endTurn() {
 function startTurn() {
     console.log("Start Turn");
     turn = turn === 'O' ? 'X' : 'O';
-    turnObject.innerHTML = "Turn: " + turn;
+    if(turn == playerShape){
+        turnObject.innerHTML = "Your Turn";
+    }
+    else{
+        turnObject.innerHTML = "Waiting For Enemy...";
+    }
+    //turnObject.innerHTML = "Turn: " + turn;
     for (let block of blocks) {
         if (spyBlock != '' && block.getAttribute('data-shape') == playerShape) {
             block.setAttribute('data-action', 'spy-guess');
@@ -632,23 +671,29 @@ function startTurn() {
 
 function updateMoveToEnemy(playerMove) {
     //console.log("Player Move : " + playerMove + " Sended")
-    update(ref(database, `Game/${roomType}Game/${currentGameID}`), { "move": [playerShape, playerMove] });
+    if (loaded) {
+        update(ref(database, `Game/${roomType}Game/${currentGameID}`), { "move": [playerShape, playerMove] });
+    }
 }
 
 function updateActionToEnemy(playerAction) {
     //console.log("Player Action : " + playerAction + " Sended")
-    update(ref(database, `Game/${roomType}Game/${currentGameID}`), { "action": [playerShape, playerAction] });
+    if (loaded) {
+        update(ref(database, `Game/${roomType}Game/${currentGameID}`), { "action": [playerShape, playerAction] });
+    }
 }
 
 function updateActionToRevolver(shotted) {
-    let playerRevolverInfo = { "Opart": 0, "Xpart": 0, "win": "" };
-    if (playerShape == 'O') {
-        playerRevolverInfo = { "Opart": playerRevolverPart, "Xpart": enemyRevolverPart, "win": shotted };
+    if (loaded) {
+        let playerRevolverInfo = { "Opart": 0, "Xpart": 0, "win": "" };
+        if (playerShape == 'O') {
+            playerRevolverInfo = { "Opart": playerRevolverPart, "Xpart": enemyRevolverPart, "win": shotted };
+        }
+        else {
+            playerRevolverInfo = { "Opart": enemyRevolverPart, "Xpart": playerRevolverPart, "win": shotted };
+        }
+        update(ref(database, `Game/${roomType}Game/${currentGameID}`), { "revolver": playerRevolverInfo });
     }
-    else {
-        playerRevolverInfo = { "Opart": enemyRevolverPart, "Xpart": playerRevolverPart, "win": shotted };
-    }
-    update(ref(database, `Game/${roomType}Game/${currentGameID}`), { "revolver": playerRevolverInfo });
 }
 
 
@@ -732,7 +777,10 @@ function updateEnemyAction() {
 }
 
 function updateSpyToEnemy(pos, shape) {
-    update(ref(database, `Game/${roomType}Game/${currentGameID}`), { "spy": [pos, shape] });
+    if (loaded) {
+        update(ref(database, `Game/${roomType}Game/${currentGameID}`), { "spy": [pos, shape] });
+    }
+
 }
 
 // animation
@@ -755,7 +803,7 @@ function eventTick() {
             enemyMove = move[1];
             updateEnemyMove();
         }
-        //console.log("Move: " + move);
+        console.log(`player ${move[0]} Move: ` + move[1]);
     })
     onValue(actionRef, (snapshot) => {
         //EnemyTakeAction
@@ -765,6 +813,7 @@ function eventTick() {
             enemyAction = action[1];
             updateEnemyAction();
         }
+        console.log(`Action: ${action[1]["item"]} at ${action[1]["pos"][0]} and ${action[1]["pos"][1]}`);
     })
     onValue(spyRef, (snapshot) => {
         //Spy ['A0', 'X']
@@ -786,19 +835,34 @@ function eventTick() {
 
 }
 
-function setUpLoseTheGame(){
+function setUpLoseTheGame() {
     window.addEventListener('beforeunload', loseTheGame);
 }
 
 
-function loseTheGame(){
+function loseTheGame() {
     console.log("Unload!");
     updateActionToRevolver(enemyShape);
 }
 
-
 function destroyRoom() {
     window.removeEventListener('beforeunload', loseTheGame);
-    set(ref(database, `Game/${roomType}Game/${currentGameID}`), null);
-    window.location = '/menu.html';
+    if (loaded) {
+        console.log("ROOM DESTROY")
+        set(ref(database, `Game/${roomType}Game/${currentGameID}`), null);
+        update(ref(database, `Users/${playerID}`), { "currentGame": '' });
+        update(ref(database, `Users/${enemyID}`), { "currentGame": '' });
+
+        if (winner == playerShape) {
+            update(ref(database, `Users/${playerID}`), { "win": playerWinAmount + 1 });
+            update(ref(database, `Users/${enemyID}`), { "lose": enemyLoseAmount + 1 });
+        } else if (winner == enemyShape) {
+            update(ref(database, `Users/${enemyID}`), { "win": enemyWinAmount + 1 });
+            update(ref(database, `Users/${playerID}`), { "lose": playerLoseAmount + 1 });
+        }
+        update(ref(database, `Users/${playerID}`), { "total": playerTotalAmount + 1 })
+        update(ref(database, `Users/${enemyID}`), { "total": enemyTotalAmount + 1 })
+
+        window.location = '/menu.html';
+    }
 }

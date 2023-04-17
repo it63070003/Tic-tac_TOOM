@@ -27,7 +27,7 @@
         text-align: center;
     }
 
-    .playwithfriendbox{
+    .playwithfriendbox {
         background-color: black;
         position: relative;
         width: 20vw;
@@ -81,13 +81,17 @@
         font-size: 2em;
         text-align: center;
     }
+
+    #game-invite {
+        visibility: hidden;
+    }
 </style>
 
 <body>
     <div onclick="location.href='./finding.html'" class="playbox">
         PLAY
     </div>
-    <div class="playwithfriendbox">
+    <div onclick="location.href='./invite.html'" class="playwithfriendbox">
         PLAY WITH FRIEND
     </div>
     <div class="helpbox">
@@ -103,38 +107,39 @@
         SIGN OUT
     </div>
     <div id="game-invite">
-        <span>JinchO invite you to play</span>
-        <button>Accept</button>
-        <button>Deny</button>
+        <span id="invite-name"></span><span> Invited you to play</span>
+        <button id="invite-accept">Accept</button>
+        <button id="invite-deny">Deny</button>
     </div>
     <!-- <h1 id="nickname">Nickname</h1> -->
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
         Launch demo modal
     </button>
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog" role="document">
-          <div class="modal-content">
-            <div class="modal-header">
-              <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-              </button>
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
+                </div>
             </div>
-            <div class="modal-body">
-              ...
-            </div>
-            <div class="modal-footer">
-              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-              <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-          </div>
         </div>
-      </div>
+    </div>
 </body>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-analytics.js";
-    import { getDatabase, ref, onValue, update } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
+    import { getDatabase, ref, onValue, update, set, get } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-database.js";
     import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-auth.js";
 
     // Your web app's Firebase configuration
@@ -154,18 +159,54 @@
     const analytics = getAnalytics(app);
     const database = getDatabase(app);
     const auth = getAuth();
+    var userId = '';
+    var roomKey = '';
 
     //const userId = ;
     onAuthStateChanged(auth, user => {
-        let userId = auth.currentUser.uid;
+        userId = auth.currentUser.uid;
         onValue(ref(database, 'Users/' + userId + '/name'), (snapshot) => {
             var data = snapshot.val();
             document.getElementById('nickname').innerText = data;
         });
+
+        onValue(ref(database, 'Users/' + userId + '/inviteToRoom'), (snapshot) => {
+            let inviteID = snapshot.val()["roomID"];
+            let inviteName = snapshot.val()["name"];
+            console.log("Invite Room ID: ", inviteID);
+            if (inviteID != '' && inviteID != null) {
+                roomKey = inviteID;
+                document.getElementById("game-invite").style.visibility = "visible";
+                document.getElementById("invite-name").innerText = inviteName;
+            } else {
+                document.getElementById("game-invite").style.visibility = "hidden";
+            }
+        });
     });
 
+    document.getElementById("invite-accept").addEventListener('click', acceptInvite);
+    function acceptInvite() {
+        console.log("Join: " + roomKey);
+        get(ref(database, `Game/privateGame/${roomKey}`)).then((room) => {
+            let shape = '';
+            room.val()['player1']['shape'] == 'X' ? shape = 'O' : shape = 'X';
+            update(ref(database, `Game/privateGame/${roomKey}`), { "player2": { "UID": userId, "shape": shape } });
+
+            let currentGame = { "roomID": roomKey, "playerNum": 2, "roomType": "private" };
+            update(ref(database, `Users/${userId}/currentGame`), currentGame);
+            set(ref(database, 'Users/' + userId + '/inviteToRoom'), null);
+            window.location = '/game.html';
+        });
+    }
+
+    document.getElementById("invite-deny").addEventListener('click', denyInvite);
+    function denyInvite() {
+        set(ref(database, 'Users/' + userId + '/inviteToRoom'), null);
+        document.getElementById("game-invite").style.visibility = "hidden";
+    }
+
     var logOut = document.getElementById("signOut");
-    logOut.addEventListener('click', (e) =>{
+    logOut.addEventListener('click', (e) => {
         signOut(auth).then(() => {
             // Sign-out successful.
             console.log("SignOutSuccess");
@@ -176,4 +217,5 @@
         });
     });
 </script>
+
 </html>
