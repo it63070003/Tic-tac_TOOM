@@ -67,19 +67,19 @@
     }
 }
 
-.fade-in-left {
-    animation: fade-in-left 1s ease forwards;
+.fade-in-bot {
+    animation: fade-in-bot 0.5s ease forwards;
 }
 
-@keyframes fade-in-left {
+@keyframes fade-in-bot {
     0% {
         opacity: 0;
-        transform: translateX(-20px);
+        transform: translateY(30px);
     }
 
     100% {
         opacity: 1;
-        transform: translateX(0);
+        transform: translateY(0);
     }
 }
 
@@ -97,4 +97,54 @@
         opacity: 0;
         transform: translateY(20px);
     }
+}
+.horizontal-shake{
+    animation: horizontal-shaking 0.35s forwards;
+}
+  
+@keyframes horizontal-shaking {
+    0% { transform: translateX(0) scaleX(-1)}
+    25% { transform: translateX(5px) scaleX(-1) }
+    50% { transform: translateX(-5px) scaleX(-1) }
+    75% { transform: translateX(5px) scaleX(-1) }
+    100% { transform: translateX(0) scaleX(-1)  }
+}
+
+.horizontal-shake-enemy{
+    animation: horizontal-shaking-enemy 0.35s forwards;
+}
+  
+@keyframes horizontal-shaking-enemy {
+    0% { transform: translateX(0)}
+    25% { transform: translateX(5px)}
+    50% { transform: translateX(-5px)}
+    75% { transform: translateX(5px)}
+    100% { transform: translateX(0)}
+}
+
+.changing-side{
+    animation: changing-side 1.25s forwards;
+}
+
+@keyframes changing-side{
+    0%{transform:scale(1.1); filter:invert(100%)}
+    10%{transform:scale(1); filter:invert(0%)}
+    30%{transform:scale(1.1); filter:invert(100%)}
+    70%{transform:scale(1); filter:invert(0%)}
+    90%{transform:scale(1.1); filter:invert(100%)}
+    100%{transform:scale(1); filter:invert(0%)}
+}
+
+.falldown{
+    animation: falldown 0.8s forwards;
+}
+
+@keyframes falldown {
+    0%{transform:translateY(-100vh)}
+    50%{transform:translateY(1vh)}
+    60%{transform:translateY(-0.9vh)}
+    70%{transform:translateY(0.7vh)}
+    80%{transform:translateY(-0.3vh)}
+    90%{transform:translateY(0.15vh)}
+    100%{transform:translateY(0vh)}
 }

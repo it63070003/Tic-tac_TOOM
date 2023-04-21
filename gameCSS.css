@@ -1,46 +1,66 @@
-body {
-    font-family: Rye;
+:root {
+    --color-1: #F5DACF;
+    --color-2: #d98b5b;
+    --color-3: #6F3317;
+    --color-4: #45423D;
 }
 
-.container{
-    margin:auto;
+body {
+    background-image: url(images/gameBG.jpg);
+    background-size: 100vw auto;
+    font-family: Rye;
+    color: white;
 }
+
+.container {
+    margin: auto;
+}
+
 /* .turn-text{
     text-align: center;
 }
 .item-text{
     text-align: center;
 } */
-.player-icon{
+.player-icon {
     text-align: center;
+    filter: drop-shadow(2px 4px 6px black);
 }
-.shapeImage{
+
+.enemy-icon{
+    filter: drop-shadow(2px 4px 6px black);
+}
+
+.shapeImage {
     height: 100%;
-    width:100%;
+    width: 100%;
     z-index: -100;
 }
-.table-block{
+
+.table-block {
+    background-color: white;
     width: 100px;
     height: 100px;
-    color: black;
+    color: white;
     font-size: 3em;
     font-weight: bold;
     line-height: 50px;
     border: solid 5px black;
     text-align: center;
-  }
+}
 
-  .ml4 {
+.ml4 {
     position: absolute;
     font-weight: 900;
     font-size: 5em;
-    width:auto;
+    width: auto;
     height: auto;
     left: 50vw;
     top: 50vh;
     transform: translate(-50%, -50%);
-  }
-.alertbox{
+}
+
+.alertbox {
     position: relative;
     width: auto;
     height: auto;
@@ -48,13 +68,15 @@ body {
     left: 0vw;
 
 }
-#currentItem{
+
+#currentItem {
     position: relative;
     width: 128px;
     height: 128px;
     border: 2px solid black;
     transform: translate(-50%, 5%);
     left: 50%;
+    filter:drop-shadow(2px 4px 6px black);
 }
 
 #currentItem-image {
@@ -67,6 +89,7 @@ body {
 }
 
 #alert-text {
+    color: black;
     position: absolute;
     top: 35%;
     left: 50%;
@@ -76,4 +99,29 @@ body {
     opacity: 0;
     animation-duration: 3.5s;
     animation-fill-mode: forwards;
+}
+
+.playerRevolverPart {
+    height: auto;
+    width: 15vw;
+    transform: scaleX(-1);
+    filter: drop-shadow(2px 4px 6px black);
+}
+
+.enemyRevolverPart {
+    height: auto;
+    width: 15vw;
+    filter:drop-shadow(2px 4px 6px black);
+}
+
+.row {
+    margin-top: 5%;
+}
+
+#playerName{
+    filter:drop-shadow(2px 4px 6px black);
+}
+
+#enemyName{
+    filter:drop-shadow(2px 4px 6px black);
 }

@@ -27,6 +27,8 @@ var currentUserID = '';
 var roomKey = '';
 var playerNum = '';
 var playerName = '';
+var canDestroyRoom = true;
+var userToInviteID = '';
 
 //const userId = ;
 onAuthStateChanged(auth, user => {
@@ -41,40 +43,43 @@ onAuthStateChanged(auth, user => {
 if (window.location.pathname == '/finding.html') {
     findingRoom();
 }
-else{
+else {
     const sendBtn = document.querySelector("#inviteBtn");
     sendBtn.addEventListener("click", sendInvite);
 }
 
 function sendInvite() {
-    console.log("Send Invite!")
     let invitedUser = document.querySelector("#invitedUser").value;
     invitedUser = invitedUser.toLowerCase();
     let foundName = false;
-    if(invitedUser == ""){
+    if (invitedUser == "") {
         alert("Please Insert Player Name")
     }
-    else{
+    else {
+        if (roomKey != '') {
+            destroyRoom(roomKey);
+        }
         const userRef = ref(database, `Users`);
-        get(userRef).then((snapshot) =>{
-            snapshot.forEach((user) =>{
+        get(userRef).then((snapshot) => {
+            snapshot.forEach((user) => {
                 console.log(user.val()["name"]);
-                if(invitedUser == user.val()["name"].toLowerCase()){
+                if (invitedUser == user.val()["name"].toLowerCase()) {
                     console.log("you will invite: " + user.val()["name"]);
                     //update(userRef, "invite", {"From", })
                     foundName = true;
                     createPrivateRoom();
-                    update(ref(database, `Users/${user.key}`), {"inviteToRoom": {"name": playerName, "roomID":roomKey}});
+                    userToInviteID = user.key;
+                    update(ref(database, `Users/${user.key}`), { "inviteToRoom": { "name": playerName, "roomID": roomKey } });
                     return true;
                     //คนเชิญ createRoom ได้ roomID update ให้ friend
                     //คนถูกเชิญมี inviteToRoom: roomID 
                 }
 
             })
-            if(!foundName){
+            if (!foundName) {
                 alert("This Player Name Does't Exist");
             }
-    })
+        })
     }
 }
 function createPrivateRoom() {
@@ -165,7 +170,7 @@ onValue(roomPrivateRef, (snapshot) => {
     enterRoom(snapshot);
 });
 
-function enterRoom(snapshot){
+function enterRoom(snapshot) {
     try {
         let player1 = snapshot.val()[roomKey]["player1"]['UID'];
         let player2 = snapshot.val()[roomKey]["player2"]['UID'];
@@ -174,6 +179,7 @@ function enterRoom(snapshot){
             update(ref(database, `Users/${currentUserID}/currentGame`), currentGame);
             //startgame
             console.log("start Game");
+            canDestroyRoom = false;
             //get(ref(database, `Users`)).then((snapshot)=>console.log(snapshot.val()[player2]));
             window.location = "/game.html";
         }
@@ -183,11 +189,21 @@ function enterRoom(snapshot){
 }
 
 function destroyRoom(key) {
-    set(ref(database, `Game/publicGame/${key}`), null);
+    set(ref(database, `Game/${roomType}Game/${key}`), null);
 }
 
 document.querySelector('#gobackBtn').addEventListener('click', goBack);
 
 function goBack() {
     window.location = '/menu.html';
+}
+
+window.addEventListener("beforeunload", destroyRoomWhenExit);
+function destroyRoomWhenExit() {
+    if (roomType == "private") {
+        update(ref(database, `Users/${userToInviteID}`), { "inviteToRoom": {"name":"", "roomID":""} });
+    }
+    if (canDestroyRoom) {
+        destroyRoom(roomKey);
+    }
 }

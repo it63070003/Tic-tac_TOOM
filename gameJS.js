@@ -122,11 +122,11 @@ function setupGame() {
                 enemyShape = snapshot.val()["player2"]["shape"]
                 playerShape = snapshot.val()["player1"]["shape"];
             }
-            
-            if(playerShape == "O"){
+
+            if (playerShape == "O") {
                 document.getElementById("turn").innerText = `Your Turn`;
             }
-            else{
+            else {
                 document.getElementById("turn").innerText = `Waiting For Enemy...`;
             }
             //console.log("enemyID: " + enemyID);
@@ -142,6 +142,7 @@ function setupGame() {
             enemyWinAmount = snapshot.val()["win"];
             enemyLoseAmount = snapshot.val()["lose"];
             displayName();
+            setUpProfilePicture();
             setUpLoseTheGame();
             loaded = true;
         });
@@ -150,6 +151,11 @@ function setupGame() {
     function displayName() {
         document.getElementById("playerName").innerText = playerName;
         document.getElementById("enemyName").innerText = enemyName
+    }
+
+    function setUpProfilePicture() {
+        document.querySelector(".player-icon>img").src = `https://api.dicebear.com/6.x/big-smile/svg?seed=${playerName}&scale=90&accessories=clownNose,mustache,sunglasses&accessoriesProbability=70`;
+        document.querySelector(".enemy-icon>img").src = `https://api.dicebear.com/6.x/big-smile/svg?seed=${enemyName}&flip=true&scale=90&accessories=clownNose,mustache,sunglasses&accessoriesProbability=70`;
     }
 
 }
@@ -208,7 +214,7 @@ for (let block of blocks) {
             }
             spyBlock = '';
 
-        } else if (shapeValue == 'E' && action == 'E' && !usingItem && spyBlock == '') {
+        } else if (shapeValue == 'E' && action == 'E' && !usingItem && spyBlock == '' && loaded) {
             // 4. Modify the code here to check whether the clicking block is avialable.
             changeShape(event.currentTarget.id, playerShape);
 
@@ -261,6 +267,10 @@ for (let block of blocks) {
             //console.log("Moving bull");
             playerAction = { "item": 'bull', "pos": bullPos };
             deleteBull = true;//delete bull if enemy place anything
+            document.querySelector(`#${event.currentTarget.id}>img`).classList.add('falldown');
+            setTimeout(() =>{
+                document.querySelector(`#${event.currentTarget.id}>img`).classList.remove('falldown');
+            }, 800)
             updateActionToEnemy(playerAction);
             if (checkResult()) {
                 return true;
@@ -277,10 +287,10 @@ function changeShape(pos, shape) {
         document.getElementById(pos).innerHTML = ``;
     } else if (shape == 'B') {
         document.getElementById(pos).innerHTML = `<img class="shapeImage" src="images/bull_block_icon.png">`;
-        document.getElementById(pos).firstChild.classList.add('fade-in-left');
+        document.getElementById(pos).firstChild.classList.add('fade-in-bot');
         setTimeout(() => {
-            document.getElementById(pos).firstChild.classList.remove('fade-in-left');
-        }, 1000);
+            document.getElementById(pos).firstChild.classList.remove('fade-in-bot');
+        }, 500);
     } else {
         document.getElementById(pos).innerHTML = `<img class="shapeImage" src="images/${shape}_shape.webp">`;
     }
@@ -289,11 +299,13 @@ function changeShape(pos, shape) {
 
 function randomItem() {
     //console.log("Randoming item");
-    let itemIndex = Math.floor(Math.random() * 5);
+    //let itemIndex = Math.floor(Math.random() * 5);
+
     // let itemIndex = Math.floor(Math.random() * 2);
     // let itemArray = [1, 3];
     // itemIndex = itemArray[itemIndex];
-    //let itemIndex = 1; //!!!!!!!!!Test item
+
+    let itemIndex = 3; //!!!!!!!!!Test item
 
     let currentItem = document.getElementById('currentItem-image');
     let itemsString = ['knife', 'trap', 'spy', 'bull', 'revolver']
@@ -504,6 +516,14 @@ function useRevolver() {
         return Math.floor(Math.random() * max) + 1;
     }
 
+    //Animation
+    let revolver = document.querySelector(".playerRevolverPart");
+    revolver.classList.add("horizontal-shake")
+    setTimeout(() => {
+        revolver.classList.remove('horizontal-shake');
+    }, 350);
+    update(ref(database, `Game/${roomType}Game/${currentGameID}/revolver`), { "shooting": playerShape });
+
     updateActionToRevolver(shotted);
 }
 
@@ -620,10 +640,10 @@ function endTurn() {
 
 
     turn = turn === 'O' ? 'X' : 'O';
-    if(turn == playerShape){
+    if (turn == playerShape) {
         turnObject.innerHTML = "Your Turn";
     }
-    else{
+    else {
         turnObject.innerHTML = "Waiting For Enemy...";
     }
     usingItem = false;
@@ -641,10 +661,10 @@ function endTurn() {
 function startTurn() {
     console.log("Start Turn");
     turn = turn === 'O' ? 'X' : 'O';
-    if(turn == playerShape){
+    if (turn == playerShape) {
         turnObject.innerHTML = "Your Turn";
     }
-    else{
+    else {
         turnObject.innerHTML = "Waiting For Enemy...";
     }
     //turnObject.innerHTML = "Turn: " + turn;
@@ -755,7 +775,12 @@ function updateEnemyAction() {
         destroyShape(pos[0])
         changeShape(pos[0], 'B');
         selectedBull = pos[0];
-        changeShape(pos[1], playerShape)
+        changeShape(pos[1], playerShape);
+        document.querySelector(`#${pos[1]}>img`).classList.add('falldown');
+        setTimeout(() =>{
+            document.querySelector(`#${pos[1]}>img`).classList.remove('falldown');
+        }, 800)
+        //Animation
     }
     // function enemyRevolver(shotted) {
     //     //enemyShoot animation
@@ -786,8 +811,8 @@ function updateSpyToEnemy(pos, shape) {
 // animation
 
 //test system bruuu
-document.querySelector("#updateEnemyMove").addEventListener('click', updateEnemyMove);
-document.querySelector("#updateEnemyAction").addEventListener('click', updateEnemyAction);
+// document.querySelector("#updateEnemyMove").addEventListener('click', updateEnemyMove);
+// document.querySelector("#updateEnemyAction").addEventListener('click', updateEnemyAction);
 
 //Firebase Functionsss
 
@@ -796,6 +821,7 @@ function eventTick() {
     const actionRef = ref(database, `Game/${roomType}Game/${currentGameID}/action`);
     const spyRef = ref(database, `Game/${roomType}Game/${currentGameID}/spy`);
     const revolverRef = ref(database, `Game/${roomType}Game/${currentGameID}/revolver`);
+    const revolverAnimRef = ref(database, `Game/${roomType}Game/${currentGameID}/revolver/shooting`);
     onValue(moveRef, (snapshot) => {
         //EnemyStartTomove
         let move = snapshot.val();
@@ -821,11 +847,58 @@ function eventTick() {
         if (spyAt[0] != '') {
             changeShape(spyAt[0], spyAt[1]);
             checkResult();
+            document.querySelector(`#${spyAt[0]}>img`).classList.add("changing-side");
+            setTimeout(() =>{
+                document.querySelector(`#${spyAt[0]}>img`).classList.remove("changing-side");
+            }, 1250);
+        }
+    })
+    onValue(revolverAnimRef, (snapshot) => {
+        if (snapshot.val() == enemyShape) {
+            let revolver = document.querySelector(".enemyRevolverPart");
+            revolver.classList.add("horizontal-shake-enemy")
+            setTimeout(() => {
+                revolver.classList.remove('horizontal-shake-enemy');
+            }, 350);
         }
     })
     onValue(revolverRef, (snapshot) => {
         playerRevolverPart = snapshot.val()[`${playerShape}part`];
         enemyRevolverPart = snapshot.val()[`${enemyShape}part`];
+        console.log("PlayerPart: " + snapshot.val()[`${playerShape}part`]);
+        if (snapshot.val()[`win`] == playerShape) {
+            document.querySelector('.playerRevolverPart').src = "images/revolver5.png";
+        }
+        else if (snapshot.val()[`${playerShape}part`] == 0) {
+            document.querySelector('.playerRevolverPart').src = "images/revolver1.png";
+        }
+        else if (snapshot.val()[`${playerShape}part`] == 1) {
+            document.querySelector('.playerRevolverPart').src = "images/revolver2.png";
+        }
+        else if (snapshot.val()[`${playerShape}part`] == 2) {
+            document.querySelector('.playerRevolverPart').src = "images/revolver3.png";
+        }
+        else if (snapshot.val()[`${playerShape}part`] == 3) {
+            document.querySelector('.playerRevolverPart').src = "images/revolver4.png";
+
+        }
+
+        if (snapshot.val()[`win`] == enemyShape) {
+            document.querySelector('.enemyRevolverPart').src = "images/revolver5.png";
+        }
+        else if (snapshot.val()[`${enemyShape}part`] == 0) {
+            document.querySelector('.enemyRevolverPart').src = "images/revolver1.png";
+        }
+        else if (snapshot.val()[`${enemyShape}part`] == 1) {
+            document.querySelector('.enemyRevolverPart').src = "images/revolver2.png";
+        }
+        else if (snapshot.val()[`${enemyShape}part`] == 2) {
+            document.querySelector('.enemyRevolverPart').src = "images/revolver3.png";
+        }
+        else if (snapshot.val()[`${enemyShape}part`] == 3) {
+            document.querySelector('.enemyRevolverPart').src = "images/revolver4.png";
+        }
+        console.log("EnemyPart: " + snapshot.val()[`${enemyShape}part`]);
         //update revolver UI
 
 
@@ -836,7 +909,7 @@ function eventTick() {
 }
 
 function setUpLoseTheGame() {
-    window.addEventListener('beforeunload', loseTheGame);
+    //!!!!!!!!!!!!!!!!!!!!!!!!!!window.addEventListener('beforeunload', loseTheGame);
 }
 
 

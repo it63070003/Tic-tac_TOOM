@@ -127,7 +127,7 @@
             console.log(data);
             document.getElementById('Total').innerText = 'Total: ' + data;
             total = data;
-            document.getElementById('Winrate').innerText = 'Win Rate: '+ (win/total)*100 +'%';
+            document.getElementById('Winrate').innerText = 'Win Rate: '+ ((win/total)*100).toFixed(2) +'%';
         });
         //Get Lose
         onValue(ref(database, 'Users/' + userId + '/lose'), (snapshot) => {
