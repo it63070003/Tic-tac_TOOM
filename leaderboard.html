@@ -4,16 +4,18 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Leaderboard</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.4/font/bootstrap-icons.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="cowboy.css">
+    <link rel="stylesheet" href="leaderboardCSS.css">
     <link href="https://fonts.googleapis.com/css2?family=Rye&display=swap" rel="stylesheet">
 </head>
 
 <body>
+    <a href="menu.html" class="back-btn">Go Back<br><span class="bi bi-arrow-left back-icon"></span></a>
     <div class="container d-flex align-items-center">
         <table class="table table-bordered">
             <thead id="leaderboard-table-head" class="table-dark">
@@ -29,6 +31,7 @@
             </tbody>
         </table>
     </div>
+
     <div id="game-invite">
         <span id="invite-name"></span><span> Invited you to play</span>
         <button id="invite-accept">Accept</button>
@@ -140,16 +143,31 @@
                 var row = table.insertRow(-1);
 
 
-                if(parseInt(player.Total) == 0){
+                if (parseInt(player.Total) == 0) {
 
-                }else{
+                } else {
                     var cell1 = row.insertCell(0);
                     var cell2 = row.insertCell(1);
                     var cell3 = row.insertCell(2);
                     var cell4 = row.insertCell(3);
                     var cell5 = row.insertCell(4);
-                    cell1.innerHTML = `${i}`;
-                    cell2.innerHTML = `${player.Name}`;
+                    switch (i) {
+                        case 1:
+                            cell1.innerHTML = `${i} <i id="gold-trophy" class="bi bi-trophy-fill gold"></i>`;
+                            cell2.innerHTML = `<span class="name gold">${player.Name}</span>`;
+                            break;
+                        case 2:
+                            cell1.innerHTML = `${i} <i id="silver-trophy" class="bi bi-trophy-fill silver"></i>`
+                            cell2.innerHTML = `<span class="name silver">${player.Name}</span>`;
+                            break;
+                        case 3:
+                            cell1.innerHTML = `${i} <i id="bronze-trophy" class="bi bi-trophy-fill bronze"></i>`
+                            cell2.innerHTML = `<span class="name bronze">${player.Name}</span>`;
+                            break;
+                        default:
+                            cell1.innerHTML = `${i}`;
+                            cell2.innerHTML = `${player.Name}`;
+                    }
                     cell3.innerHTML = `${player.Win}`;
                     cell4.innerHTML = `${player.Total}`;
                     cell5.innerHTML = `${parseFloat(player.Winrate).toFixed(2)}%`;

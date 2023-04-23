@@ -16,12 +16,6 @@ body {
     margin: auto;
 }
 
-/* .turn-text{
-    text-align: center;
-}
-.item-text{
-    text-align: center;
-} */
 .player-icon {
     text-align: center;
     filter: drop-shadow(2px 4px 6px black);

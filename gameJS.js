@@ -87,6 +87,7 @@ var playerLoseAmount = 0;
 var enemyLoseAmount = 0;
 var playerTotalAmount = 0;
 var enemyTotalAmount = 0;
+var playingAnimation = false;
 
 setupGame();
 function setupGame() {
@@ -169,7 +170,7 @@ for (let block of blocks) {
             block.onclick = null;
             return false;
         }
-        if (turn != playerShape) {
+        if (turn != playerShape || playingAnimation) {
             return false;
         }
         let shapeValue = event.currentTarget.getAttribute('data-shape');
@@ -268,7 +269,7 @@ for (let block of blocks) {
             playerAction = { "item": 'bull', "pos": bullPos };
             deleteBull = true;//delete bull if enemy place anything
             document.querySelector(`#${event.currentTarget.id}>img`).classList.add('falldown');
-            setTimeout(() =>{
+            setTimeout(() => {
                 document.querySelector(`#${event.currentTarget.id}>img`).classList.remove('falldown');
             }, 800)
             updateActionToEnemy(playerAction);
@@ -299,17 +300,17 @@ function changeShape(pos, shape) {
 
 function randomItem() {
     //console.log("Randoming item");
-    //let itemIndex = Math.floor(Math.random() * 5);
+    let itemIndex = Math.floor(Math.random() * 5);
 
     // let itemIndex = Math.floor(Math.random() * 2);
     // let itemArray = [1, 3];
     // itemIndex = itemArray[itemIndex];
 
-    let itemIndex = 3; //!!!!!!!!!Test item
+    //let itemIndex = 4; //!!!!!!!!!Test item
 
     let currentItem = document.getElementById('currentItem-image');
     let itemsString = ['knife', 'trap', 'spy', 'bull', 'revolver']
-    let itemsImg = ['images/knife_icon.png', 'images/trap_icon.png', 'images/spy_icon.png', 'images/bull_icon.png', 'images/gun_part_icon.webp']
+    let itemsImg = ['images/knife_icon.png', 'images/trap_icon.png', 'images/spy_icon.png', 'images/bull_icon.png', 'images/revolver_icon.png']
 
     currentItem.src = itemsImg[itemIndex];
     currentItem.style.display = 'block';
@@ -470,7 +471,13 @@ function checkRevolver() {
 
 function useKnife(shape) {
     let shapePos = shape.id;
-    destroyShape(shapePos);
+    document.querySelector(`#${shapePos}>img`).classList.add('grey-out-down');
+    playingAnimation = true;
+    setTimeout(() => {
+        document.querySelector(`#${shapePos}>img`).classList.remove('grey-out-down');
+        destroyShape(shapePos);
+        playingAnimation = false;
+    }, 500);
     return shapePos;
 }
 
@@ -663,6 +670,10 @@ function startTurn() {
     turn = turn === 'O' ? 'X' : 'O';
     if (turn == playerShape) {
         turnObject.innerHTML = "Your Turn";
+        turnObject.classList.add('your-turn');
+        setTimeout(() => {
+            turnObject.classList.remove('your-turn');
+        }, 1000);
     }
     else {
         turnObject.innerHTML = "Waiting For Enemy...";
@@ -763,7 +774,13 @@ function updateEnemyAction() {
     startTurn();
 
     function enemyKnife(pos) {
-        destroyShape(pos);
+        document.querySelector(`#${pos}>img`).classList.add('grey-out-down');
+        playingAnimation = true;
+        setTimeout(() => {
+            document.querySelector(`#${pos}>img`).classList.remove('grey-out-down');
+            destroyShape(pos);
+            playingAnimation = false;
+        }, 500);
     }
     function enemyTrap(pos) {
         trappedBlock = pos;
@@ -777,7 +794,7 @@ function updateEnemyAction() {
         selectedBull = pos[0];
         changeShape(pos[1], playerShape);
         document.querySelector(`#${pos[1]}>img`).classList.add('falldown');
-        setTimeout(() =>{
+        setTimeout(() => {
             document.querySelector(`#${pos[1]}>img`).classList.remove('falldown');
         }, 800)
         //Animation
@@ -848,7 +865,7 @@ function eventTick() {
             changeShape(spyAt[0], spyAt[1]);
             checkResult();
             document.querySelector(`#${spyAt[0]}>img`).classList.add("changing-side");
-            setTimeout(() =>{
+            setTimeout(() => {
                 document.querySelector(`#${spyAt[0]}>img`).classList.remove("changing-side");
             }, 1250);
         }
@@ -909,7 +926,7 @@ function eventTick() {
 }
 
 function setUpLoseTheGame() {
-    //!!!!!!!!!!!!!!!!!!!!!!!!!!window.addEventListener('beforeunload', loseTheGame);
+    window.addEventListener('beforeunload', loseTheGame);
 }
 
 

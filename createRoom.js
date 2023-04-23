@@ -102,6 +102,7 @@ function createPrivateRoom() {
 
 function findingRoom() {
     console.log("Finding");
+    roomType = "public";
     let foundRoom = false;
     let roomToJoin = '';
     get(publicGameRef).then((snapshot) => {

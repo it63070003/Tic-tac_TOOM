@@ -10,85 +10,51 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rye&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="menu.css">
 </head>
-<style>
-    body {
-        font-family: Rye;
-    }
-
-    .playbox {
-        background-color: black;
-        position: relative;
-        width: 20vw;
-        top: 20vh;
-        left: 40vw;
-        color: white;
-        font-size: 2em;
-        text-align: center;
-    }
-
-    .playwithfriendbox {
-        background-color: black;
-        position: relative;
-        width: 20vw;
-        top: 30vh;
-        left: 40vw;
-        color: white;
-        font-size: 2em;
-        text-align: center;
-    }
-
-    .helpbox {
-        background-color: black;
-        position: relative;
-        width: 20vw;
-        top: 40vh;
-        left: 40vw;
-        color: white;
-        font-size: 2em;
-        text-align: center;
-    }
-
-    .profilebox {
-        background-color: black;
-        position: relative;
-        width: 20vw;
-        top: 50vh;
-        left: 40vw;
-        color: white;
-        font-size: 2em;
-        text-align: center;
-    }
-
-    .leaderboardbox {
-        background-color: black;
-        position: relative;
-        width: 20vw;
-        top: 60vh;
-        left: 40vw;
-        color: white;
-        font-size: 2em;
-        text-align: center;
-    }
-
-    .signoutbox {
-        background-color: black;
-        position: relative;
-        width: 20vw;
-        top: 70vh;
-        left: 40vw;
-        color: white;
-        font-size: 2em;
-        text-align: center;
-    }
-
-    #game-invite {
-        visibility: hidden;
-    }
-</style>
 
 <body>
-    <div onclick="location.href='./finding.html'" class="playbox">
+    <div class="d-flex flex-column mb-3">
+        <div onclick="location.href='./finding.html'" class="d-flex justify-content-center box">
+            Play
+        </div>
+        <div onclick="location.href='./invite.html'" class="d-flex justify-content-center box">
+            Play With Friend
+        </div>
+        <div class="d-flex justify-content-center box">
+            How To Play
+        </div>
+        <div onclick="location.href='./profile.html'" class="d-flex justify-content-center box">
+            Profile
+        </div>
+        <div onclick="location.href='./leaderboard.html'" class="d-flex justify-content-center box">
+            Leaderboard
+        </div>
+        <div id='signOut' class="box">
+            Sign Out
+        </div>
+    </div>
+    <!-- <div class="d-flex flex-column mb-3">
+        <div onclick="location.href='./finding.html'" class="box">
+            Play
+        </div>
+        <div onclick="location.href='./invite.html'" class="box">
+            Play With Friend
+        </div>
+        <div class="box">
+            How To Play
+        </div>
+        <div onclick="location.href='./profile.html'" class="box">
+            Profile
+        </div>
+        <div onclick="location.href='./leaderboard.html'" class="box">
+            Leaderboard
+        </div>
+        <div id='signOut' class="box">
+            Sign Out
+        </div>
+    </div> -->
+    <!-- <div onclick="location.href='./finding.html'" class="playbox">
         PLAY
     </div>
     <div onclick="location.href='./invite.html'" class="playwithfriendbox">
@@ -105,36 +71,13 @@
     </div>
     <div id='signOut' class="signoutbox">
         SIGN OUT
-    </div>
+    </div> -->
     <div id="game-invite">
         <span id="invite-name"></span><span> Invited you to play</span>
         <button id="invite-accept">Accept</button>
         <button id="invite-deny">Deny</button>
     </div>
     <!-- <h1 id="nickname">Nickname</h1> -->
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
-        Launch demo modal
-    </button>
-    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    ...
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">Save changes</button>
-                </div>
-            </div>
-        </div>
-    </div>
 </body>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.17.1/firebase-app.js";
