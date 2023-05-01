@@ -2,6 +2,7 @@ body {
     background-color: #d98b5b;
     background-image: linear-gradient(to bottom, #ffaf2f, #f5b76b, #7c684649);
     background-blend-mode: overlay;
+    background-attachment: fixed;
   }
 
   .back-btn {
