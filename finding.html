@@ -14,87 +14,61 @@
 <style>
     body {
         font-family: Rye;
+        background-color: #d98b5b;
+        background-image: linear-gradient(to bottom, #ffaf2f, #f5b76b, #7c684649);
+        background-blend-mode: overlay;
+        cursor: url("images/cursor_hand.png") 3 1, auto;
     }
 
-    .playbox {
-        background-color: black;
-        position: relative;
-        width: 20vw;
-        top: 20vh;
-        left: 40vw;
-        color: white;
-        font-size: 2em;
-        text-align: center;
+    body:active {
+        cursor: url("images/cursor_hand.png") 10 0, auto;
     }
 
-    .playwithfriendbox{
-        background-color: black;
-        position: relative;
-        width: 20vw;
-        top: 30vh;
-        left: 40vw;
-        color: white;
-        font-size: 2em;
-        text-align: center;
+    .spinner {
+        animation: rotation 5s linear infinite;
+        width: 20%;
     }
 
-    .helpbox {
-        background-color: black;
-        position: relative;
-        width: 20vw;
-        top: 40vh;
-        left: 40vw;
-        color: white;
-        font-size: 2em;
-        text-align: center;
+    @keyframes rotation {
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(359deg);
+        }
     }
 
-    .profilebox {
-        background-color: black;
-        position: relative;
-        width: 20vw;
-        top: 50vh;
-        left: 40vw;
-        color: white;
-        font-size: 2em;
-        text-align: center;
-    }
-
-    .leaderboardbox {
-        background-color: black;
-        position: relative;
-        width: 20vw;
-        top: 60vh;
-        left: 40vw;
-        color: white;
-        font-size: 2em;
-        text-align: center;
-    }
-
-    .signoutbox {
-        background-color: black;
-        position: relative;
-        width: 20vw;
-        top: 70vh;
-        left: 40vw;
-        color: white;
-        font-size: 2em;
-        text-align: center;
-    }
-
-    #gobackBtn{
+    #gobackBtn {
+        margin-top: 20px;
         cursor: pointer;
     }
 </style>
+</head>
 
 <body>
-    <div class="playbox">
-        Searching for other player...
-    </div>
-    <div id="gobackBtn">
-        Cancel
+    <div class="container d-flex flex-column justify-content-center align-items-center vh-100">
+        <img src="images/revload.PNG" class="spinner" />
+
+        <h3 class="mt-3 finding-text dot-animation">Finding game</h3>
+        <span dot-animation></span>
+        <button class="btn btn-danger mt-3" id="gobackBtn">Cancel</button>
     </div>
 </body>
 <script type="module" src="createRoom.js"></script>
+<script>
+    const findingGameText = document.querySelector('.finding-text');
+    let dotsCount = 0;
+    const maxDotsCount = 3;
+    setInterval(() => {
+        if (dotsCount >= maxDotsCount) {
+            dotsCount = 0;
+            findingGameText.textContent = 'Finding game';
+        } else {
+            dotsCount++;
+            findingGameText.textContent += '.';
+        }
+    }, 800);
+</script>
 
 </html>

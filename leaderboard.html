@@ -11,6 +11,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="stylesheet" href="leaderboardCSS.css">
+    <link rel="stylesheet" href="inviteCSS.css">
     <link href="https://fonts.googleapis.com/css2?family=Rye&display=swap" rel="stylesheet">
 </head>
 
@@ -20,11 +21,11 @@
         <table class="table table-bordered">
             <thead id="leaderboard-table-head" class="table-dark">
                 <tr>
-                    <th scope="col">Rank</th>
-                    <th scope="col">Name</th>
-                    <th scope="col">Win</th>
-                    <th scope="col">Total Game</th>
-                    <th scope="col">Win Rate</th>
+                    <th style="width:10%;" scope="col">Rank</th>
+                    <th style="width:40%;" scope="col">Name</th>
+                    <th style="width:5%;" scope="col">Win</th>
+                    <th style="width:5%;" scope="col">Total Game</th>
+                    <th style="width:10%;" scope="col">Win Rate</th>
                 </tr>
             </thead>
             <tbody id="leaderboard-body">
@@ -32,10 +33,10 @@
         </table>
     </div>
 
-    <div id="game-invite">
-        <span id="invite-name"></span><span> Invited you to play</span>
-        <button id="invite-accept">Accept</button>
-        <button id="invite-deny">Deny</button>
+    <div id="game-invite" class="d-flex flex-column"> <!--game-invite -->
+        <span id="invite-name"></span><span class="item-invite"> Invited you to play</span>
+        <button class="btn btn-dark item-invite" id="invite-accept">Accept</button>
+        <button class="btn btn-dark item-invite" id="invite-deny">Deny</button>
     </div>
 
 </body>
@@ -74,8 +75,8 @@
         });
 
         setUpInvite();
+        privateGameCleaner();
     });
-
     function setUpInvite() {
         onValue(ref(database, 'Users/' + userId + '/inviteToRoom'), (snapshot) => {
             let inviteID = snapshot.val()["roomID"];
@@ -84,9 +85,11 @@
             if (inviteID != '' && inviteID != null) {
                 roomKey = inviteID;
                 document.getElementById("game-invite").style.visibility = "visible";
+                document.getElementById("game-invite").classList.add('pop-invite');
                 document.getElementById("invite-name").innerText = inviteName;
             } else {
-                document.getElementById("game-invite").style.visibility = "hidden";
+                document.getElementById("game-invite").classList.remove('pop-invite');
+                document.getElementById("game-invite").style.visibility = "hidden";//heddien
             }
         });
     }
@@ -139,13 +142,11 @@
             console.log(sortedplayers);
             let i = 1;
             sortedplayers.forEach((player) => {
-                var table = document.getElementById("leaderboard-body");
-                var row = table.insertRow(-1);
-
-
                 if (parseInt(player.Total) == 0) {
 
                 } else {
+                    var table = document.getElementById("leaderboard-body");
+                    var row = table.insertRow(-1);
                     var cell1 = row.insertCell(0);
                     var cell2 = row.insertCell(1);
                     var cell3 = row.insertCell(2);
@@ -171,11 +172,32 @@
                     cell3.innerHTML = `${player.Win}`;
                     cell4.innerHTML = `${player.Total}`;
                     cell5.innerHTML = `${parseFloat(player.Winrate).toFixed(2)}%`;
+                    i += 1;
                 }
-                i += 1;
+                
 
             })
         })
+    }
+
+    function privateGameCleaner() {
+        //This function is a Bodge lol ???
+        const privateGameRef = ref(database, "Game/privateGame");
+        get(privateGameRef).then((snapshot) => {
+            snapshot.forEach((room) => {
+                let roomObjectLength = Object.keys(room.val()).length;
+                if (roomObjectLength != 6) {
+                    destroyRoom(room.key);
+                }
+                else if (room.val()["revolver"]['win'] != "") {
+                    destroyRoom(room.key);
+                }
+            });
+        }
+        );
+        function destroyRoom(key) {
+            set(ref(database, `Game/privateGame/${key}`), null);
+        }
     }
 </script>
 

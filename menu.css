@@ -11,11 +11,12 @@ body{
     background-image: linear-gradient(to bottom, #ffaf2f, #f5b76b, #7c684658);
     background-blend-mode: overlay;
     cursor: url("images/cursor_hand.png") 3 1, auto;
+    overflow: hidden;
 }
-#game-invite {
-    visibility: hidden;
-    position: absolute;
+body:active{
+    cursor: url("images/cursor_hand.png") 10 0, auto;
 }
+
 .container{
     height: 100vh;
     text-align: center;
@@ -29,18 +30,39 @@ body{
 }
 .box{
     position:relative;
-    background-color: #F5DACF;
+    background-color: rgb(233, 233, 233);
     padding: 1%;
     border: 3px solid black;
     border-radius: 8%;
-    width: fit-content;
+    width: 20%;
     text-align: center;
     margin-top: auto;
     margin-left: auto;
     margin-right: auto; 
     margin-bottom: auto;
     text-align: center;
+    box-shadow:1px -2px 5px black;
 }
 .box:hover{
     background-color: #ff911c;
+    color: white;
+}
+
+.gameTitle{
+    font-size: 5em;
+}
+
+@media screen and (max-width: 626px) {
+    .gameTitle{
+        font-size: 3.5em;
+    }
+}
+
+@media screen and (max-width: 595px) {
+    .box{
+        width: 50%;
+    }
+    .gameTitle{
+        font-size: 3em;
+    }
 }

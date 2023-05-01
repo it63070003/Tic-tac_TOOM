@@ -5,11 +5,16 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
+    integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.4/font/bootstrap-icons.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Rye&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="profile.css">
+    <link rel="stylesheet" href="inviteCSS.css">
 </head>
-<style>
+<!-- <style>
     body {
         font-family: Rye;
     }
@@ -60,10 +65,28 @@
         font-size: 1em;
         text-align: center;
     }
-</style>
+</style> -->
 
 <body>
-    <div class="ProfileContainer">
+    <div id="profile-box" class="container">
+        <a href="menu.html" class="back-btn">Go Back<br><span class="bi bi-arrow-left back-icon"></span></a>
+        <div class="Profileheader row justify-content-center">Profile</div>
+        <div class="row justify-content-center">
+            <form>
+                <img id="player-icon" class="row justify-content-center" src="">
+                <label id="name" class="formlabel row justify-content-center" for="Nickname">Your Name</label>
+                <p id="Total" class="formlabel row justify-content-center" for="Total">Total:</p>
+                <p id="Win" class="formlabel row justify-content-center" for="Win">Win:</p>
+                <p id="Lose" class="formlabel row justify-content-center" for="Lose">Lose:</p>
+                <p id="Winrate" class="formlabel row justify-content-center" for="Winrate">Winrate:</p>
+                <div class="row justify-content-center" id="change-name-input">
+                    <input id="Nickname" type="text">
+                    <input id="confirm" class="Confirmbox" type="button" value="Change Name">
+                </div>
+            </form>
+        </div>
+    </div>
+    <!-- <div class="ProfileContainer">
         <div class="Profileheader">Profile</div>
         <form>
             <label class="formlabel" for="Nickname">Your Name</label><br>
@@ -74,6 +97,11 @@
             <p id="Winrate" class="formlabel" for="Winrate">Winrate:</p><br>
             <input id="confirm" class="Confirmbox" type="button" value="Change Name">
         </form>
+    </div> -->
+    <div id="game-invite" class="d-flex flex-column">  <!--game-invite -->
+        <span id="invite-name"></span><span class="item-invite"> Invited you to play</span>
+        <button class="btn btn-dark item-invite" id="invite-accept">Accept</button>
+        <button class="btn btn-dark item-invite" id="invite-deny">Deny</button>
     </div>
 </body>
 <script type="module">
@@ -100,6 +128,7 @@
     const database = getDatabase(app);
     const auth = getAuth();
     var userId = "";
+    var roomKey = '';
 
     var win = 0;
     var total = 0;
@@ -111,6 +140,8 @@
             var data = snapshot.val();
             console.log(data);
             document.getElementById('Nickname').placeholder = data;
+            document.getElementById('player-icon').src = `https://api.dicebear.com/6.x/big-smile/svg?seed=${data}&scale=90&accessories=clownNose,mustache,sunglasses&accessoriesProbability=70`;
+            document.getElementById('name').innerText = data;
         });
 
         //Get Win
@@ -136,11 +167,17 @@
             document.getElementById('Lose').innerText = 'Lose: ' + data;
         });
 
+        setUpInvite();
+
     });
 
     var confirmBtn = document.getElementById('confirm')
     confirmBtn.addEventListener('click', (e) => {
         let newName = document.getElementById('Nickname').value;
+        if(newName.length > 20){
+            alert("Name too long (Max:20 chars)");
+            return false;
+        }
         get(ref (database, 'Users')).then((snapshot)=>{
             let nameDupe = false;
             snapshot.forEach((user)=>{
@@ -152,10 +189,47 @@
                 alert("This Name is already been used");
             }else{
                 set(ref(database, 'Users/' + userId + '/name'), newName);
+                alert("Name Changed");
             }
         });
         
     });
+
+    function setUpInvite() {
+        onValue(ref(database, 'Users/' + userId + '/inviteToRoom'), (snapshot) => {
+            let inviteID = snapshot.val()["roomID"];
+            let inviteName = snapshot.val()["name"];
+            console.log("Invite Room ID: ", inviteID);
+            if (inviteID != '' && inviteID != null) {
+                roomKey = inviteID;
+                document.getElementById("game-invite").style.visibility = "visible";
+                document.getElementById("game-invite").classList.add('pop-invite');
+                document.getElementById("invite-name").innerText = inviteName;
+            } else {
+                document.getElementById("game-invite").classList.remove('pop-invite');
+                document.getElementById("game-invite").style.visibility = "hidden";//heddien
+            }
+        });
+    }
+    document.getElementById("invite-accept").addEventListener('click', acceptInvite);
+    function acceptInvite() {
+        console.log("Join: " + roomKey);
+        get(ref(database, `Game/privateGame/${roomKey}`)).then((room) => {
+            let shape = '';
+            room.val()['player1']['shape'] == 'X' ? shape = 'O' : shape = 'X';
+            update(ref(database, `Game/privateGame/${roomKey}`), { "player2": { "UID": userId, "shape": shape } });
+
+            let currentGame = { "roomID": roomKey, "playerNum": 2, "roomType": "private" };
+            update(ref(database, `Users/${userId}/currentGame`), currentGame);
+            set(ref(database, 'Users/' + userId + '/inviteToRoom'), null);
+            window.location = '/game.html';
+        });
+    }
+    document.getElementById("invite-deny").addEventListener('click', denyInvite);
+    function denyInvite() {
+        set(ref(database, 'Users/' + userId + '/inviteToRoom'), null);
+        document.getElementById("game-invite").style.visibility = "hidden";
+    }
 
 
 </script>

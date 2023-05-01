@@ -19,6 +19,7 @@ body {
     color: #ccc;
     transform: translateX(-5px) scale(1.1);
   }
+  
   .back-icon {
     font-size: 36px;
     padding-right: 10px;

@@ -1,0 +1,50 @@
+body {
+    cursor: url("images/cursor_hand.png") 3 1, auto;
+}
+
+body:active {
+    cursor: url("images/cursor_hand.png") 10 0, auto;
+}
+
+.item-invite {
+    margin: 1%;
+    white-space: nowrap;
+}
+
+.invite-accept {
+    border: 1px solid black;
+    color: red;
+}
+
+.pop-invite {
+    animation: pop-invite-anim 1.25s forwards;
+}
+
+#invite-name {
+    font-size: 2em;
+}
+
+#game-invite {
+    position: absolute;
+    bottom: 0%;
+    left: 0%;
+    background-color: #F5DACF;
+    padding: 1%;
+    border-top: 3px solid black;
+    border-right: 3px solid black;
+    width: fit-content;
+    text-align: center;
+    height: auto;
+    visibility: hidden;
+    border-top-right-radius: 30%;
+}
+
+@keyframes pop-invite-anim {
+    0% {
+        transform: translateY(100%);
+    }
+
+    100% {
+        transform: translateY(0%);
+    }
+}

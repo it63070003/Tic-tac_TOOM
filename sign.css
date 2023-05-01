@@ -1,0 +1,69 @@
+:root {
+    --color-1: #F5DACF;
+    --color-2: #d98b5b;
+    --color-3: #6F3317;
+    --color-4: #45423D;
+}
+body{
+    font-family: Rye;
+    background-color: var(--color-2);
+    background-image: linear-gradient(to bottom, #ffaf2f, #f5b76b, #7c684658);
+    background-blend-mode: overlay;
+    cursor: url("images/cursor_hand.png") 3 1, auto;
+    overflow: hidden;
+}
+body:active{
+    cursor: url("images/cursor_hand.png") 10 0, auto;
+}
+.back-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    transition: all .2s ease-in-out;
+  }
+  
+  .back-btn:hover {
+    color: #ccc;
+    transform: translateX(-5px) scale(1.1);
+  }
+  .back-icon {
+    font-size: 36px;
+    padding-right: 10px;
+    transform: scaleX(-1);
+  }
+.sign-box{
+    border: 2px solid black;
+    background-color: rgb(206, 206, 206);
+    /*rgb(184, 156, 106);*/
+    padding: 1%;
+    padding-bottom: 0.5;
+    border-radius:3%;
+    filter: drop-shadow(2px 4px 6px black);
+}
+
+input::placeholder{
+    font-size: 0.8em;
+}
+
+.btn:hover{
+    cursor: url("images/cursor_hand.png") 3 1, auto;
+}
+
+.flex-column{
+    height: 100vh;
+    gap:2%;
+    align-items: center;
+    padding-top: 5%;
+    padding-bottom: 5%;
+}
+.loginheader{
+    text-align: center;
+    font-size: 1.7em;
+}
+.input-group input{
+    margin: auto;
+}

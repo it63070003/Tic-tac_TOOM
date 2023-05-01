@@ -50,10 +50,17 @@ else {
 
 function sendInvite() {
     let invitedUser = document.querySelector("#invitedUser").value;
+    const inviteResponse = document.querySelector("#inviteResponse");
     invitedUser = invitedUser.toLowerCase();
     let foundName = false;
     if (invitedUser == "") {
-        alert("Please Insert Player Name")
+        // alert("Please Insert Player Name")
+        inviteResponse.innerText = "Please Insert Player Name";
+        inviteResponse.style.color = "red";
+    }
+    else if(invitedUser == playerName.toLowerCase()){
+        inviteResponse.innerText = "You can't invite yourself";
+        inviteResponse.style.color = "red";
     }
     else {
         if (roomKey != '') {
@@ -65,10 +72,13 @@ function sendInvite() {
                 console.log(user.val()["name"]);
                 if (invitedUser == user.val()["name"].toLowerCase()) {
                     console.log("you will invite: " + user.val()["name"]);
+                    inviteResponse.innerText = "Invited: " + user.val()["name"];
+                    inviteResponse.style.color = "#08DC08";
                     //update(userRef, "invite", {"From", })
                     foundName = true;
                     createPrivateRoom();
                     userToInviteID = user.key;
+                    update(ref(database, `Users/${userToInviteID}`), { "inviteToRoom": {"name":"", "roomID":""} });
                     update(ref(database, `Users/${user.key}`), { "inviteToRoom": { "name": playerName, "roomID": roomKey } });
                     return true;
                     //คนเชิญ createRoom ได้ roomID update ให้ friend
@@ -77,7 +87,9 @@ function sendInvite() {
 
             })
             if (!foundName) {
-                alert("This Player Name Does't Exist");
+                // alert("This Player Name Does't Exist");
+                inviteResponse.innerText = "This Player Name Does't Exist";
+                inviteResponse.style.color = "red";
             }
         })
     }

@@ -1,0 +1,73 @@
+:root {
+    --color-1: #F5DACF;
+    --color-2: #d98b5b;
+    --color-3: #6F3317;
+    --color-4: #45423D;
+}
+
+body{
+    font-family: Rye;
+    background-color: var(--color-2);
+    background-image: linear-gradient(to bottom, #ffaf2f, #f5b76b, #7c684658);
+    background-blend-mode: overlay;
+    cursor: url("images/cursor_hand.png") 3 1, auto;
+    /* overflow: hidden; */
+}
+body:active{
+    cursor: url("images/cursor_hand.png") 10 0, auto;
+}
+
+.container {
+	max-width: 800px;
+	margin: 0 auto;
+	padding: 50px 0;
+}
+
+h1 {
+	font-size: 36px;
+	text-align: center;
+	margin-bottom: 30px;
+}
+
+.image-container {
+	text-align: center;
+	margin-bottom: 30px;
+}
+
+.description {
+	text-align: center;
+	margin-bottom: 30px;
+}
+
+.button-container {
+	text-align: center;
+}
+
+.back-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    transition: all .2s ease-in-out;
+  }
+  
+  .back-btn:hover {
+    color: #ccc;
+    transform: translateX(-5px) scale(1.1);
+  }
+  
+  .back-icon {
+    font-size: 36px;
+    padding-right: 10px;
+    transform: scaleX(-1);
+  }
+  .next, .previous{
+	color: white;
+	font-size: 3em;
+  }
+  .next:hover, .previous:hover{
+	color: rgb(95, 49, 203);
+  }

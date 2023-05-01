@@ -926,7 +926,7 @@ function eventTick() {
 }
 
 function setUpLoseTheGame() {
-    window.addEventListener('beforeunload', loseTheGame);
+   window.addEventListener('beforeunload', loseTheGame);
 }
 
 
@@ -942,6 +942,10 @@ function destroyRoom() {
         set(ref(database, `Game/${roomType}Game/${currentGameID}`), null);
         update(ref(database, `Users/${playerID}`), { "currentGame": '' });
         update(ref(database, `Users/${enemyID}`), { "currentGame": '' });
+
+        let date = new Date();
+        let currentDate = date.getDate()+'-'+(date.getMonth()+1)+'-'+date.getFullYear(); 
+        update(ref(database, `Users/${playerID}`), { "lastPlay":  currentDate})
 
         if (winner == playerShape) {
             update(ref(database, `Users/${playerID}`), { "win": playerWinAmount + 1 });

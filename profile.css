@@ -1,0 +1,82 @@
+/*https://api.dicebear.com/6.x/big-smile/svg?seed=${playerName}&scale=90&accessories=clownNose,mustache,sunglasses&accessoriesProbability=70*/
+body{
+    font-family: Rye;
+    background-color: var(--color-2);
+    background-image: linear-gradient(to bottom, #ffaf2f, #f5b76b, #7c684658);
+    background-blend-mode: overlay;
+    cursor: url("images/cursor_hand.png") 3 1, auto;
+    overflow: hidden;
+    font-size:1.2em;
+}
+body:active{
+    cursor: url("images/cursor_hand.png") 10 0, auto;
+}
+#player-icon{
+    height: 20%;;
+    width: auto;
+    margin: auto;
+}
+#profile-box{
+    background-image:url('images/profile_bg.png');
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+    border: 3px solid black;
+    width: 50%;
+    height: 100%;
+    margin-top: 0%;
+    box-shadow: 0px 0px 50px rgba(0, 0, 0, 0.8);
+}
+#change-name-input{
+    width: 30%;
+    margin: auto;
+}
+.Profileheader {
+    font-size: 2em;
+}
+#Nickname{
+    margin: auto;
+}
+#confirm{
+    /* position: relative;
+    width: 100%; */
+    margin: auto;
+    /* left: 10%; */
+}
+#name{
+    font-size:2em;
+}
+.back-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    color: #fff;
+    text-decoration: none;
+    font-size: 18px;
+    font-weight: bold;
+    transition: all .2s ease-in-out;
+  }
+  
+  .back-btn:hover {
+    color: #ccc;
+    transform: translateX(-5px) scale(1.1);
+  }
+  .back-icon {
+    font-size: 36px;
+    padding-right: 10px;
+    transform: scaleX(-1);
+  }
+@media screen and (max-width: 1156px) {
+    #change-name-input{
+        width: 50%;
+        margin: auto;
+    }
+}
+@media screen and (max-width: 720px) {
+    #change-name-input{
+        width: 100%;
+        margin: auto;
+    }
+    #profile-box{
+        width: 100vw;
+    }
+}
