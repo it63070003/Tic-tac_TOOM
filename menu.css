@@ -7,9 +7,11 @@
 
 body{
     font-family: Rye;
-    background-color: var(--color-2);
-    background-image: linear-gradient(to bottom, #ffaf2f, #f5b76b, #7c684658);
-    background-blend-mode: overlay;
+    background-color: linear-gradient(#ffde59,#ff914d);
+    background-image:url('images/menu_bg.png');
+    background-position: auto;
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
     cursor: url("images/cursor_hand.png") 3 1, auto;
     overflow: hidden;
 }
@@ -30,9 +32,11 @@ body:active{
 }
 .box{
     position:relative;
-    background-color: rgb(233, 233, 233);
+    background-image:url('images/btn_bg.png');
+    background-position: center;
+    background-size: auto;
     padding: 1%;
-    border: 3px solid black;
+    border: 3px solid #45423D;
     border-radius: 8%;
     width: 20%;
     text-align: center;
@@ -50,6 +54,16 @@ body:active{
 
 .gameTitle{
     font-size: 5em;
+    animation: fontcolor 15s infinite;
+}
+
+@keyframes fontcolor{
+    0% {color:#000;}
+    25% {color: #241207;}
+    50% {color: #db2b2b;}
+    75% {color: #241207;}
+    100% {color: #000;}
+
 }
 
 @media screen and (max-width: 626px) {
@@ -58,6 +72,7 @@ body:active{
     }
 }
 
+
 @media screen and (max-width: 595px) {
     .box{
         width: 50%;
@@ -65,4 +80,5 @@ body:active{
     .gameTitle{
         font-size: 3em;
     }
+ 
 }

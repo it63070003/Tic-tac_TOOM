@@ -2,7 +2,7 @@
 body{
     font-family: Rye;
     background-color: var(--color-2);
-    background-image: linear-gradient(to bottom, #ffaf2f, #f5b76b, #7c684658);
+    background-image: linear-gradient(to bottom, #ffaf2f, #976513, #000);
     background-blend-mode: overlay;
     cursor: url("images/cursor_hand.png") 3 1, auto;
     overflow: hidden;
@@ -18,6 +18,7 @@ body:active{
 }
 #profile-box{
     background-image:url('images/profile_bg.png');
+    padding: 4%;
     background-repeat: no-repeat;
     background-size: 100% 100%;
     border: 3px solid black;
@@ -39,7 +40,7 @@ body:active{
 #confirm{
     /* position: relative;
     width: 100%; */
-    margin: auto;
+    margin: 2%
     /* left: 10%; */
 }
 #name{
@@ -70,6 +71,7 @@ body:active{
         width: 50%;
         margin: auto;
     }
+
 }
 @media screen and (max-width: 720px) {
     #change-name-input{
