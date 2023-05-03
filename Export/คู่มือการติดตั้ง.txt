@@ -1,0 +1,8 @@
+1.Extract File
+2.เปิด index.html
+
+Dependencies
+1.Bootstrap 5.3.0
+2.Bootstrap icon 1.10.4
+2.API dicebear
+3.Google font Rye

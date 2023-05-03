@@ -46,14 +46,6 @@ body {
     color: #fff;
   }
   
-  .table tbody tr:nth-child(even) {
-    background-color: #F5F5F5;
-  }
-  
-  .table tbody tr:hover {
-    background-color: #FFE4C4;
-  }
-  
   .table {
     border-collapse: separate;
     border-spacing: 0 10px;
@@ -107,4 +99,7 @@ body {
 
   .bronze {
     color: #ca8b4c;
+  }
+  @media screen and (max-width: 575px){
+    
   }

@@ -5,34 +5,37 @@
     --color-4: #45423D;
 }
 
-body{
+body {
     font-family: Rye;
-    background-color: linear-gradient(#ffde59,#ff914d);
-    background-image:url('images/menu_bg.png');
+    background-color: linear-gradient(#ffde59, #ff914d);
+    background-image: url('images/menu_bg.png');
     background-position: auto;
     background-size: 100% 100%;
     background-repeat: no-repeat;
     cursor: url("images/cursor_hand.png") 3 1, auto;
     overflow: hidden;
 }
-body:active{
+
+body:active {
     cursor: url("images/cursor_hand.png") 10 0, auto;
 }
 
-.container{
+.container {
     height: 100vh;
     text-align: center;
 }
-.flex-column{
+
+.flex-column {
     height: 100vh;
-    gap:2%;
+    gap: 2%;
     align-items: center;
     padding-top: 5%;
     padding-bottom: 5%;
 }
-.box{
-    position:relative;
-    background-image:url('images/btn_bg.png');
+
+.box {
+    position: relative;
+    background-image: url('images/btn_bg.png');
     background-position: center;
     background-size: auto;
     padding: 1%;
@@ -42,43 +45,96 @@ body:active{
     text-align: center;
     margin-top: auto;
     margin-left: auto;
-    margin-right: auto; 
+    margin-right: auto;
     margin-bottom: auto;
     text-align: center;
-    box-shadow:1px -2px 5px black;
+    box-shadow: 1px -2px 5px black;
 }
-.box:hover{
+
+.box:hover {
     background-color: #ff911c;
     color: white;
 }
 
-.gameTitle{
+.gameTitle {
     font-size: 5em;
     animation: fontcolor 15s infinite;
 }
 
-@keyframes fontcolor{
-    0% {color:#000;}
-    25% {color: #241207;}
-    50% {color: #db2b2b;}
-    75% {color: #241207;}
-    100% {color: #000;}
+.welcome-text {
+    visibility: hidden;
+}
+
+.profile-display {
+    position: absolute;
+    top: 0%;
+    right: 0%;
+    background-color: #F5DACF;
+    padding: 1%;
+    border-bottom: 3px solid black;
+    border-left: 5px solid black;
+    width: fit-content;
+    height: auto;
+    visibility: visible;
+    /* border-bottom-left-radius: 50%; */
+    display:flex;
+    align-items: center;
+}
+
+#profile-image {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+}
+
+#profile-name {
+    font-size: 1em;
+}
+
+@keyframes fontcolor {
+    0% {
+        color: #000;
+    }
+
+    25% {
+        color: #241207;
+    }
+
+    50% {
+        color: #db2b2b;
+    }
+
+    75% {
+        color: #241207;
+    }
+
+    100% {
+        color: #000;
+    }
 
 }
 
 @media screen and (max-width: 626px) {
-    .gameTitle{
+    .gameTitle {
         font-size: 3.5em;
     }
 }
 
 
 @media screen and (max-width: 595px) {
-    .box{
+    .box {
         width: 50%;
     }
-    .gameTitle{
+
+    .gameTitle {
         font-size: 3em;
     }
- 
+
+    .welcome-text {
+        visibility: visible;
+    }
+
+    .profile-display {
+        visibility: hidden;
+    }
 }

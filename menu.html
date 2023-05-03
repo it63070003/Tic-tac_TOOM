@@ -15,10 +15,16 @@
 </head>
 
 <body>
+    <div class="profile-display"> 
+        <span id="profile-name"></span><img id="profile-image" src="">
+    </div>
     <div class="d-flex flex-column mb-3">
         <h1 class="gameTitle d-flex justify-content-center">
             Tic-tac_TOOM!
         </h1>
+        <div class="d-flex justify-content-center welcome-text">
+            <span id="nickname">Test</span>
+        </div>
         <div onclick="location.href='./finding.html'" class="d-flex justify-content-center box">
             Play
         </div>
@@ -114,7 +120,9 @@
         userId = auth.currentUser.uid;
         onValue(ref(database, 'Users/' + userId + '/name'), (snapshot) => {
             var data = snapshot.val();
-            document.getElementById('nickname').innerText = data;
+            document.getElementById('nickname').innerText = `🤠 ${data} 🤠`;
+            document.getElementById('profile-name').innerText = `${data}`;
+            document.getElementById('profile-image').src = `https://api.dicebear.com/6.x/big-smile/svg?seed=${data}&scale=80&accessories=clownNose,mustache,sunglasses&accessoriesProbability=70`;
         });
 
         setUpInvite();

@@ -155,27 +155,25 @@
                     switch (i) {
                         case 1:
                             cell1.innerHTML = `${i} <i id="gold-trophy" class="bi bi-trophy-fill gold"></i>`;
-                            cell2.innerHTML = `<span class="name gold">${player.Name}</span>`;
+                            cell2.innerHTML = `<span class="name normal-name gold">${player.Name}</span>`;
                             break;
                         case 2:
                             cell1.innerHTML = `${i} <i id="silver-trophy" class="bi bi-trophy-fill silver"></i>`
-                            cell2.innerHTML = `<span class="name silver">${player.Name}</span>`;
+                            cell2.innerHTML = `<span class="name normal-name silver">${player.Name}</span>`;
                             break;
                         case 3:
                             cell1.innerHTML = `${i} <i id="bronze-trophy" class="bi bi-trophy-fill bronze"></i>`
-                            cell2.innerHTML = `<span class="name bronze">${player.Name}</span>`;
+                            cell2.innerHTML = `<span class="name normal-name bronze">${player.Name}</span>`;
                             break;
                         default:
                             cell1.innerHTML = `${i}`;
-                            cell2.innerHTML = `${player.Name}`;
+                            cell2.innerHTML = `<span class="normal-name">${player.Name}</span>`;
                     }
                     cell3.innerHTML = `${player.Win}`;
                     cell4.innerHTML = `${player.Total}`;
                     cell5.innerHTML = `${parseFloat(player.Winrate).toFixed(2)}%`;
                     i += 1;
                 }
-                
-
             })
         })
     }

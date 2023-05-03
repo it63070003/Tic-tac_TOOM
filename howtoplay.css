@@ -10,6 +10,7 @@ body{
     background-color: var(--color-2);
     background-image: linear-gradient(to bottom, #ffaf2f, #f5b76b, #7c684658);
     background-blend-mode: overlay;
+    background-attachment: fixed;
     background-size: cover;
     cursor: url("images/cursor_hand.png") 3 1, auto;
     /* overflow: hidden; */

@@ -150,7 +150,7 @@ function setupGame() {
     }
 
     function displayName() {
-        document.getElementById("playerName").innerText = playerName;
+        document.getElementById("playerName").innerText = `${playerName} (YOU)`;
         document.getElementById("enemyName").innerText = enemyName
     }
 
